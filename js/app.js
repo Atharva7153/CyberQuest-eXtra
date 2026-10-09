@@ -417,7 +417,8 @@ class NexusApplication {
     if (this.els.resultsConfirmedContent) this.els.resultsConfirmedContent.hidden = false;
 
     if (this.els.resFinalScore) {
-      this.els.resFinalScore.textContent = Number(summary.finalScore || 0).toLocaleString();
+      const roundPts = Number(summary.finalScore || 0);
+      this.els.resFinalScore.textContent = `+${roundPts.toLocaleString()}`;
     }
     if (this.els.resPersonalBest) {
       this.els.resPersonalBest.textContent = Number(summary.personalBest || 0).toLocaleString();

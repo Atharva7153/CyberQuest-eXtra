@@ -605,7 +605,7 @@ export class NexusAuthoritativeEngine {
       const totalQuestions = session.questionSequence.length;
       const accuracy = Math.round((correctCount / totalQuestions) * 100);
 
-      // Atomic GREATEST(existing_best_score, validated_new_score) update
+      // Atomic cumulative score addition (Grind Mode: every round adds to total score)
       const existingBest = this._scoresByPlayerId.get(playerId);
       let isNewPersonalBest = false;
 
@@ -626,22 +626,12 @@ export class NexusAuthoritativeEngine {
         existingBest.displayName = player.displayName;
         existingBest.updatedAt = nowMs;
 
-        const isStrictlyBetter =
-          finalScore > existingBest.bestScore ||
-          (finalScore === existingBest.bestScore && accuracy > existingBest.bestAccuracy) ||
-          (finalScore === existingBest.bestScore &&
-            accuracy === existingBest.bestAccuracy &&
-            totalResponseTimeMs < existingBest.fastestTimeMs);
-
-        if (isStrictlyBetter) {
-          isNewPersonalBest = finalScore > existingBest.bestScore;
-          existingBest.bestScore = Math.max(existingBest.bestScore, finalScore);
-          existingBest.bestAccuracy = accuracy;
-          existingBest.fastestTimeMs = totalResponseTimeMs;
+        isNewPersonalBest = finalScore > 0;
+        existingBest.bestScore = existingBest.bestScore + finalScore;
+        existingBest.bestAccuracy = Math.max(existingBest.bestAccuracy, accuracy);
+        existingBest.fastestTimeMs = Math.min(existingBest.fastestTimeMs, totalResponseTimeMs);
+        if (finalScore > 0) {
           existingBest.achievedAt = nowMs;
-        } else {
-          // Enforce GREATEST guarantee explicitly
-          existingBest.bestScore = Math.max(existingBest.bestScore, finalScore);
         }
       }
 

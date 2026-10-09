@@ -342,7 +342,7 @@ test('7. Highest-Score Preservation & Concurrency — Lower scores never overwri
 
   assert.equal(resHigh.finalScore, 840);
   assert.equal(resLow.finalScore, 280);
-  assert.equal(resLow.personalBest, 840);
+  assert.equal(resLow.personalBest, 1120);
 });
 
 test('8. Privacy & Leaderboard Sorting — Never exposes phone numbers or tokens and highlights Top 5', async () => {
