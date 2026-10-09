@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#060606" />
+  <meta
+    name="description"
+    content="CYBER QUEST EXTRA — Timed 6-question True/False mathematics challenge inside the NEXUS system."
+  />
+  <title>CYBER QUEST EXTRA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Oswald:wght@600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <!-- =====================================================================
+       ANIMATED FIRST-TIME ENTRY CUTSCENE OVERLAY
+       ===================================================================== -->
+  <div id="intro-cutscene" class="cutscene-overlay" role="dialog" aria-label="Intro Cutscene" hidden>
+    <!-- Animated Background Slides -->
+    <div class="cutscene-stage">
+      <div class="cutscene-slide slide-1">
+        <img src="./assets/images/briefing-monolith.jpg" alt="" class="cutscene-bg-img" />
+      </div>
+      <div class="cutscene-slide slide-2">
+        <img src="./assets/images/enter-system-corridor.jpg" alt="" class="cutscene-bg-img" />
+      </div>
+      <div class="cutscene-slide slide-3">
+        <img src="./assets/images/hero-nexus-ring.jpg" alt="" class="cutscene-bg-img" />
+      </div>
+
+      <!-- Animated Red Laser Core Line & Scanline Overlay -->
+      <div class="cutscene-laser-line" aria-hidden="true"></div>
+      <div class="cutscene-vignette" aria-hidden="true"></div>
+
+      <!-- Top Bar: System Telemetry + Skip Button -->
+      <div class="cutscene-top-bar">
+        <span class="cutscene-rec-badge">
+          <span class="rec-dot" aria-hidden="true"></span>
+          NEXUS TRANSMISSION // 2035
+        </span>
+        <button type="button" id="btn-skip-cutscene" class="btn-skip-cutscene">
+          SKIP INTRO →
+        </button>
+      </div>
+
+      <!-- Animated Story Captions -->
+      <div class="cutscene-center-content">
+        <div class="cutscene-caption cap-1">
+          <span class="cap-kicker">YEAR 2035 // SYSTEM OVERRIDE</span>
+          <h2 class="cap-title">NEXUS CONTROLS THE WORLD</h2>
+          <p class="cap-sub">“Human decision-making is the greatest threat to humanity.”</p>
+        </div>
+
+        <div class="cutscene-caption cap-2">
+          <span class="cap-kicker">RESTRICTED ACCESS POINT</span>
+          <h2 class="cap-title">THE RESISTANCE HAS ENTERED</h2>
+          <p class="cap-sub">Every calculation under pressure is being watched.</p>
+        </div>
+
+        <div class="cutscene-caption cap-3">
+          <span class="cap-kicker">NEXUS: THE LAST CHANCE</span>
+          <h2 class="cap-title cap-title-hero">
+            CYBER QUEST <span class="text-red">EXTRA</span>
+          </h2>
+          <p class="cap-sub">6 QUESTIONS. 5 SECONDS. OUTSMART THE SYSTEM.</p>
+        </div>
+      </div>
+
+      <!-- Bottom Progress Bar -->
+      <div class="cutscene-progress-track" aria-hidden="true">
+        <div id="cutscene-progress-fill" class="cutscene-progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subtle Frame Accents -->
+  <div class="theme-frame-left" aria-hidden="true"></div>
+  <div class="theme-grid-lines" aria-hidden="true"></div>
+
+  <!-- Minimal Clean Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <button type="button" id="nav-brand-btn" class="brand-lockup" aria-label="Home">
+        <span class="brand-cyber">CYBER QUEST</span>
+        <span class="brand-nexus">EXTRA</span>
+      </button>
+
+      <div class="header-controls">
+        <div id="header-operator-badge" class="operator-badge" hidden>
+          <strong id="header-operator-name" class="operator-value"></strong>
+          <button
+            type="button"
+            id="btn-switch-operator"
+            class="btn-link-subtle"
+            title="Switch Player"
+          >
+            [LOGOUT]
+          </button>
+        </div>
+
+        <nav class="site-nav" aria-label="Navigation">
+          <button type="button" id="nav-btn-mission" class="nav-tab is-active">
+            PLAY
+          </button>
+          <button type="button" id="nav-btn-leaderboard" class="nav-tab">
+            LEADERBOARD
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="app-main" class="app-main">
+    <!-- ===================================================================
+         SCREEN 1 — LOGIN & START SCREEN (Title: CYBER QUEST EXTRA)
+         =================================================================== -->
+    <section id="screen-register" class="screen-section is-active" aria-labelledby="login-headline">
+      <div class="editorial-split login-split">
+        <div class="editorial-copy">
+          <div class="tag-row">
+            <span class="red-tag-block">6-QUESTION SPRINT</span>
+            <button type="button" id="btn-replay-cutscene" class="btn-watch-intro">
+              ▶ WATCH INTRO
+            </button>
+          </div>
+
+          <h1 id="login-headline" class="display-title-stack">
+            <span class="title-line-white">CYBER QUEST</span>
+            <span class="title-line-red">EXTRA</span>
+          </h1>
+
+          <p class="editorial-lead">
+            6 rapid True/False math questions. 5 seconds per question.
+          </p>
+
+          <!-- View A: Login Form (Shown when player is not logged in) -->
+          <form id="register-form" class="nexus-form" novalidate>
+            <div class="form-group">
+              <label for="reg-player-name" class="form-label">PLAYER NAME</label>
+              <input
+                type="text"
+                id="reg-player-name"
+                name="name"
+                class="form-input"
+                placeholder="Enter your name"
+                maxlength="36"
+                autocomplete="name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="reg-player-phone" class="form-label">
+                MOBILE NUMBER <span class="label-hint">(PRIVATE)</span>
+              </label>
+              <div class="phone-input-group">
+                <span class="phone-prefix" aria-hidden="true">+91</span>
+                <input
+                  type="tel"
+                  id="reg-player-phone"
+                  name="phone"
+                  class="form-input phone-field"
+                  placeholder="98765 43210"
+                  inputmode="numeric"
+                  maxlength="14"
+                  autocomplete="tel"
+                  required
+                />
+              </div>
+            </div>
+
+            <div id="register-error-box" class="form-error-alert" role="alert" hidden></div>
+
+            <div class="cta-row">
+              <button type="submit" id="btn-register-submit" class="btn-primary-red">
+                START GAME
+                <span class="btn-arrow" aria-hidden="true">→</span>
+              </button>
+              <button type="button" id="btn-intro-leaderboard" class="btn-secondary-dark">
+                LEADERBOARD
+              </button>
+            </div>
+
+            <p class="privacy-micro-note">
+              Phone number is kept private and never shown on the leaderboard.
+              <button type="button" id="btn-open-privacy" class="btn-inline-link">Privacy</button>
+            </p>
+          </form>
+
+          <!-- View B: Instant Start Box (Shown when player is already logged in) -->
+          <div id="returning-operator-panel" class="returning-operator-box" hidden>
+            <p class="operator-greeting">
+              LOGGED IN AS <strong id="briefing-operator-name" class="text-red">PLAYER</strong>
+            </p>
+            <div class="controls-instruction-box">
+              <div class="control-key-item">
+                <kbd>← LEFT</kbd>
+                <span>FALSE</span>
+              </div>
+              <div class="control-key-sep" aria-hidden="true">//</div>
+              <div class="control-key-item">
+                <kbd>RIGHT →</kbd>
+                <span>TRUE</span>
+              </div>
+            </div>
+            <div class="cta-row">
+              <button type="button" id="btn-begin-mission" class="btn-primary-red">
+                PLAY 6-QUESTION ROUND
+                <span class="btn-arrow" aria-hidden="true">→</span>
+              </button>
+              <button type="button" id="btn-briefing-leaderboard" class="btn-secondary-dark">
+                LEADERBOARD
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="editorial-artwork">
+          <div class="artwork-frame">
+            <img
+              src="./assets/images/hero-nexus-ring.jpg"
+              alt="NEXUS monolith"
+              class="artwork-img"
+              width="1200"
+              height="1133"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         SCREEN 2 — GAMEPLAY (6 Questions, Mobile Single-Screen Fit)
+         =================================================================== -->
+    <section id="screen-game" class="screen-section game-portal-section" hidden aria-label="Active Game">
+      <div class="game-arena-container">
+        <div id="game-countdown-overlay" class="countdown-overlay" hidden aria-live="assertive">
+          <div class="countdown-inner">
+            <span class="countdown-kicker">NEXUS</span>
+            <div id="game-countdown-number" class="countdown-digit">3</div>
+            <p id="game-countdown-subtext" class="countdown-sub">GET READY...</p>
+          </div>
+        </div>
+
+        <!-- Compact Telemetry Bar -->
+        <div class="game-telemetry-top">
+          <div class="integrity-cluster">
+            <span id="game-integrity-value" class="integrity-label">SYSTEM INTEGRITY: 100%</span>
+            <div class="integrity-track" aria-hidden="true">
+              <div id="game-integrity-bar-fill" class="integrity-fill" style="width: 100%"></div>
+            </div>
+          </div>
+
+          <div id="game-nexus-message" class="nexus-live-banner" aria-live="polite">
+            <span class="nexus-eye-dot" aria-hidden="true"></span>
+            <strong id="game-nexus-message-text">HUMAN RESISTANCE DETECTED.</strong>
+          </div>
+        </div>
+
+        <!-- 3-Column HUD: Question Progress | Timer | Score -->
+        <div class="game-hud-grid">
+          <div class="hud-cell">
+            <span id="hud-label-question" class="hud-label">QUESTION</span>
+            <strong id="game-question-progress" class="hud-value">01 / 06</strong>
+          </div>
+
+          <div class="hud-cell hud-cell-center">
+            <span id="hud-label-time" class="hud-label">TIME</span>
+            <strong id="game-timer-Numeric" class="hud-value hud-timer-val">05.0s</strong>
+          </div>
+
+          <div class="hud-cell hud-cell-right">
+            <span id="hud-label-score" class="hud-label">SCORE</span>
+            <strong id="game-score" class="hud-value text-red">0</strong>
+          </div>
+        </div>
+
+        <!-- Countdown Bar -->
+        <div class="timer-bar-track" aria-hidden="true">
+          <div id="game-timer-bar-fill" class="timer-bar-fill"></div>
+        </div>
+
+        <!-- Equation Stage with Big Clear Verdict Banner -->
+        <div id="game-equation-box" class="equation-stage">
+          <div class="equation-stage-meta">
+            <span id="game-difficulty-badge" class="difficulty-pill">QUESTION 1 OF 6</span>
+            <span id="game-feedback-badge" class="game-feedback-badge" aria-live="assertive">
+              CHOOSE TRUE OR FALSE
+            </span>
+          </div>
+
+          <div id="game-equation" class="equation-display" aria-live="assertive">
+            17 + 28 = 45
+          </div>
+        </div>
+
+        <!-- Large Touch & Keyboard Accessible TRUE / FALSE Buttons -->
+        <div class="answer-controls-grid" role="group" aria-label="True or False">
+          <button type="button" id="btn-answer-false" class="btn-decision btn-false">
+            <span class="decision-key-hint" aria-hidden="true">← TAP OR LEFT</span>
+            <span class="decision-label">FALSE</span>
+          </button>
+
+          <button type="button" id="btn-answer-true" class="btn-decision btn-true">
+            <span class="decision-key-hint" aria-hidden="true">TAP OR RIGHT →</span>
+            <span class="decision-label">TRUE</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         SCREEN 3 — RESULTS SCREEN (Clean Score Card)
+         =================================================================== -->
+    <section id="screen-results" class="screen-section" hidden aria-labelledby="results-headline">
+      <div id="results-processing-state" class="results-status-panel" aria-live="polite">
+        <div class="spinner-ring" aria-hidden="true"></div>
+        <h2 class="display-heading-md">SAVING <span class="text-red">SCORE...</span></h2>
+      </div>
+
+      <div id="results-network-error-state" class="results-status-panel is-error" hidden role="alert">
+        <div class="red-tag-block">CONNECTION ERROR</div>
+        <p id="results-error-message" class="editorial-body">
+          Could not confirm score with the server.
+        </p>
+        <div class="cta-row">
+          <button type="button" id="btn-retry-confirmation" class="btn-primary-red">
+            RETRY
+          </button>
+        </div>
+      </div>
+
+      <div id="results-confirmed-content" class="results-card-centered" hidden>
+        <div class="red-tag-block">ROUND COMPLETE</div>
+        <h2 id="results-headline" class="display-heading-lg">
+          YOUR <span class="text-red">RESULTS</span>
+        </h2>
+
+        <div class="results-hero-metrics">
+          <div class="metric-card metric-card-primary">
+            <span class="metric-label">ROUND SCORE</span>
+            <strong id="res-final-score" class="metric-big-value">0</strong>
+            <span id="res-new-best-badge" class="metric-pill-red" hidden>NEW BEST!</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">BEST SCORE</span>
+            <strong id="res-personal-best" class="metric-big-value">0</strong>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">RANK</span>
+            <strong id="res-current-rank" class="metric-big-value text-red">#--</strong>
+            <span id="res-top-five-badge" class="metric-pill-red" hidden>TOP 5</span>
+          </div>
+        </div>
+
+        <div class="results-stats-strip">
+          <div class="stat-mini">
+            <span class="stat-mini-label">CORRECT</span>
+            <strong id="res-correct-count" class="stat-mini-val text-green">0</strong>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-mini-label">WRONG</span>
+            <strong id="res-incorrect-count" class="stat-mini-val text-red">0</strong>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-mini-label">MISSED</span>
+            <strong id="res-unanswered-count" class="stat-mini-val">0</strong>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-mini-label">ACCURACY</span>
+            <strong id="res-accuracy-value" class="stat-mini-val">0%</strong>
+          </div>
+        </div>
+
+        <p id="res-nexus-verdict-text" class="revelation-quote"></p>
+
+        <div class="cta-row">
+          <button type="button" id="btn-play-again" class="btn-primary-red">
+            PLAY AGAIN
+            <span class="btn-arrow" aria-hidden="true">→</span>
+          </button>
+          <button type="button" id="btn-results-leaderboard" class="btn-secondary-dark">
+            VIEW LEADERBOARD
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         SCREEN 4 — PUBLIC LEADERBOARD
+         =================================================================== -->
+    <section id="screen-leaderboard" class="screen-section" hidden aria-labelledby="leaderboard-headline">
+      <div class="leaderboard-single-container">
+        <div class="leaderboard-header-block">
+          <div>
+            <div class="red-tag-block">TOP PLAYERS (<span id="leaderboard-total-count">0</span>)</div>
+            <h2 id="leaderboard-headline" class="display-heading-lg">
+              LEADER<span class="text-red">BOARD</span>
+            </h2>
+          </div>
+
+          <div class="leaderboard-meta-controls">
+            <span id="leaderboard-sync-status" class="sync-pill">LIVE</span>
+            <span id="leaderboard-last-updated" class="sync-timestamp"></span>
+            <button type="button" id="btn-refresh-leaderboard" class="btn-secondary-sm">
+              REFRESH
+            </button>
+          </div>
+        </div>
+
+        <div id="leaderboard-state-loading" class="leaderboard-state-box" aria-live="polite">
+          <div class="spinner-ring" aria-hidden="true"></div>
+          <p>LOADING LEADERBOARD...</p>
+        </div>
+
+        <div id="leaderboard-state-empty" class="leaderboard-state-box" hidden>
+          <p class="state-title">NO SCORES YET</p>
+          <p class="state-sub">Play a 6-question round to claim #01.</p>
+        </div>
+
+        <div id="leaderboard-state-offline" class="leaderboard-state-box is-warning" hidden>
+          <p class="state-title">OFFLINE</p>
+          <p class="state-sub">Reconnect to load rankings.</p>
+        </div>
+
+        <div id="leaderboard-state-error" class="leaderboard-state-box is-error" hidden>
+          <p class="state-title">COULD NOT LOAD LEADERBOARD</p>
+          <p id="leaderboard-error-text" class="state-sub"></p>
+          <button type="button" id="btn-leaderboard-retry" class="btn-secondary-sm">
+            RETRY
+          </button>
+        </div>
+
+        <div id="leaderboard-table-wrapper" class="leaderboard-table-container" hidden>
+          <table class="nexus-leaderboard-table" aria-label="Leaderboard">
+            <thead>
+              <tr>
+                <th scope="col" class="col-rank">RANK</th>
+                <th scope="col" class="col-operator">PLAYER</th>
+                <th scope="col" class="col-accuracy">ACCURACY</th>
+                <th scope="col" class="col-score">BEST SCORE</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="leaderboard-footer-meta">
+          <div class="cta-row">
+            <button type="button" id="btn-leaderboard-play" class="btn-primary-red">
+              PLAY NOW
+              <span class="btn-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>CYBER QUEST EXTRA // NEXUS</span>
+      <span id="backend-mode-indicator" class="backend-indicator">READY</span>
+    </div>
+  </footer>
+
+  <!-- Privacy Notice Modal -->
+  <div
+    id="privacy-modal"
+    class="modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="privacy-modal-title"
+    hidden
+  >
+    <div class="modal-panel">
+      <div class="red-tag-block">PRIVACY NOTICE</div>
+      <h3 id="privacy-modal-title" class="display-heading-md">PLAYER PRIVACY</h3>
+      <div class="modal-body-copy">
+        <p>
+          Your name and mobile number are used only to identify your best score and contact top
+          finishers for the Cyber Quest event. Your phone number is never displayed on the public
+          leaderboard.
+        </p>
+      </div>
+      <div class="cta-row">
+        <button type="button" id="btn-close-privacy" class="btn-primary-red">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# ============================================================================
+# CYBER QUEST — NEXUS: THE LAST CHANCE
+# Supabase CLI Configuration
+# ============================================================================
+project_id = "cyber-quest-nexus"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 100
+
+[db]
+port = 54322
+major_version = 15
+
+[functions.register-player]
+verify_jwt = false
+
+[functions.create-session]
+verify_jwt = false
+
+[functions.submit-answer]
+verify_jwt = false
+
+[functions.finalize-session]
+verify_jwt = false
+
+[functions.get-leaderboard]
+verify_jwt = false

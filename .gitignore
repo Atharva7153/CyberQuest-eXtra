@@ -1,0 +1,16 @@
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Environment & Secrets (NEVER commit actual .env or service_role keys)
+.env
+.env.local
+.env.*.local
+supabase/.temp/
+supabase/.branches/
+
+# Optional local tooling
+node_modules/
+npm-debug.log*
