@@ -12,8 +12,8 @@
 import { CONFIG, isCloudConfigured } from './config.js';
 import { NexusAuthoritativeEngine } from './coreEngine.js';
 
-const OPERATOR_STORAGE_KEY = 'nexus_operator_session_v1';
-const PENDING_FINALIZE_KEY = 'nexus_pending_finalization_v1';
+const OPERATOR_STORAGE_KEY = 'nexus_operator_session_cloud_v2';
+const PENDING_FINALIZE_KEY = 'nexus_pending_finalization_v2';
 const SIMULATED_SERVER_SNAPSHOT_KEY = 'nexus_local_authoritative_db_v1';
 
 class PersistentLocalAuthoritativeAdapter {

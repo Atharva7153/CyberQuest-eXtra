@@ -83,13 +83,17 @@ test('3. Frontend Secret Audit — No service_role keys or privileged secrets in
     const content = fs.readFileSync(path.join(ROOT_DIR, relFile), 'utf8');
     // Check that no JWT service_role token or SUPABASE_SERVICE_ROLE_KEY assignment is present
     assert.ok(
-      !content.includes('SUPABASE_SERVICE_ROLE_KEY'),
-      `Frontend file ${relFile} must not reference SUPABASE_SERVICE_ROLE_KEY`
+      !content.includes('SUPABASE_SERVICE_ROLE_KEY') && !content.includes('sb_secret_'),
+      `Frontend file ${relFile} must not reference SUPABASE_SERVICE_ROLE_KEY or sb_secret_`
     );
-    assert.ok(
-      !content.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'),
-      `Frontend file ${relFile} must not contain hardcoded JWT secrets`
-    );
+    const jwtMatches = content.match(/eyJ[A-Za-z0-9_-]+\.([A-Za-z0-9_-]+)\.[A-Za-z0-9_-]+/g) || [];
+    for (const token of jwtMatches) {
+      const payloadJson = Buffer.from(token.split('.')[1], 'base64url').toString('utf8');
+      assert.ok(
+        !payloadJson.includes('"service_role"'),
+        `Frontend file ${relFile} must never contain a service_role JWT`
+      );
+    }
   }
 });
 

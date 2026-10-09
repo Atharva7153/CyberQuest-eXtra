@@ -10,8 +10,11 @@ export const CONFIG = Object.freeze({
   // =========================================================================
   // SUPABASE CLOUD CONFIGURATION
   // =========================================================================
-  SUPABASE_URL: window.__NEXUS_CONFIG__?.SUPABASE_URL || 'https://YOUR_PROJECT_REF.supabase.co',
-  SUPABASE_ANON_KEY: window.__NEXUS_CONFIG__?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_PUBLIC_ANON_KEY',
+  SUPABASE_URL:
+    window.__NEXUS_CONFIG__?.SUPABASE_URL || 'https://ttyhobmughtbqpwlbcqg.supabase.co',
+  SUPABASE_ANON_KEY:
+    window.__NEXUS_CONFIG__?.SUPABASE_ANON_KEY ||
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0eWhvYm11Z2h0YnFwd2xiY3FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTg1NTAsImV4cCI6MjEwNzEzNDU1MH0._O2NR5QKP-3Sr7JGP_F6JM0KM8vPTbwoWD2g_S3k7Ac',
 
   ENDPOINTS: Object.freeze({
     REGISTER_PLAYER: '/register-player',

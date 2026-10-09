@@ -28,7 +28,7 @@ import {
   verifyPlayerOwnership,
 } from '../_shared/security.ts';
 
-const SERVER_LATENCY_GRACE_MS = 1200;
+const SERVER_LATENCY_GRACE_MS = 8000;
 const BASE_POINTS = 100;
 const MAX_SPEED_BONUS = 50;
 
