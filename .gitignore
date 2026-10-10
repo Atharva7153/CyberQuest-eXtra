@@ -14,3 +14,6 @@ supabase/.branches/
 # Optional local tooling
 node_modules/
 npm-debug.log*
+
+# Local database CSV exports (contains private player phone numbers)
+*.csv
