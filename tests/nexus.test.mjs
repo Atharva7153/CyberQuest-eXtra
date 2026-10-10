@@ -19,8 +19,8 @@ import {
 
 const QUESTION_MAP = new Map(QUESTION_BANK.map((q) => [q.id, q]));
 
-test('1. Question Bank — All 180 questions are verified and unambiguous', () => {
-  assert.equal(QUESTION_BANK.length, 180, 'Expected 180 questions in QUESTION_BANK');
+test('1. Question Bank — All 380 questions are verified and unambiguous', () => {
+  assert.equal(QUESTION_BANK.length, 380, 'Expected 380 questions in QUESTION_BANK');
 
   let trueCount = 0;
   let falseCount = 0;
@@ -36,7 +36,7 @@ test('1. Question Bank — All 180 questions are verified and unambiguous', () =
     else falseCount += 1;
   }
 
-  assert.ok(trueCount >= 80 && falseCount >= 80, 'Question bank must be balanced between TRUE and FALSE');
+  assert.ok(trueCount >= 180 && falseCount >= 180, 'Question bank must be balanced between TRUE and FALSE');
 });
 
 test('2. Registration & Phone Normalization — Enforces Indian mobile format and uniqueness', () => {
