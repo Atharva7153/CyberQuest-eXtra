@@ -165,32 +165,46 @@
             6 rapid True/False logic, cyber &amp; math challenges. 5 seconds each.
           </p>
 
-          <!-- Live CyberQuest Main Event Countdown -->
+          <!-- Live CyberQuest Main Event Doomsday Countdown -->
           <div id="event-countdown-widget" class="event-countdown-widget" aria-label="CyberQuest begins countdown">
-            <div class="event-countdown-header">
-              <span class="rec-dot" aria-hidden="true"></span>
-              <span id="event-countdown-label" class="event-countdown-kicker">⚡ CYBERQUEST BEGINS IN:</span>
+            <div class="event-countdown-top">
+              <div class="event-countdown-header">
+                <span class="rec-dot" aria-hidden="true"></span>
+                <span id="event-countdown-label" class="event-countdown-kicker">CYBERQUEST BEGINS IN</span>
+              </div>
+              <button
+                type="button"
+                id="btn-countdown-sound"
+                class="btn-countdown-sound is-active"
+                aria-label="Toggle countdown ticking sound"
+                title="Toggle Ticking Sound"
+              >
+                <span id="countdown-sound-icon" aria-hidden="true">🔊</span>
+                <span id="countdown-sound-text">TICK ON</span>
+              </button>
             </div>
+
             <div class="event-countdown-grid">
               <div class="event-time-box">
                 <span id="cd-days" class="event-time-val">06</span>
                 <span class="event-time-unit">DAYS</span>
               </div>
-              <span class="event-time-sep" aria-hidden="true">:</span>
               <div class="event-time-box">
                 <span id="cd-hours" class="event-time-val">13</span>
-                <span class="event-time-unit">HRS</span>
+                <span class="event-time-unit">HOURS</span>
               </div>
-              <span class="event-time-sep" aria-hidden="true">:</span>
               <div class="event-time-box">
                 <span id="cd-minutes" class="event-time-val">50</span>
-                <span class="event-time-unit">MIN</span>
+                <span class="event-time-unit">MINS</span>
               </div>
-              <span class="event-time-sep" aria-hidden="true">:</span>
-              <div class="event-time-box event-time-box-sec">
+              <div id="cd-sec-box" class="event-time-box event-time-box-sec">
                 <span id="cd-seconds" class="event-time-val">00</span>
-                <span class="event-time-unit">SEC</span>
+                <span class="event-time-unit">SECS</span>
               </div>
+            </div>
+
+            <div class="event-countdown-sweep-track" aria-hidden="true">
+              <div id="cd-sweep-bar" class="event-countdown-sweep-fill"></div>
             </div>
           </div>
 
