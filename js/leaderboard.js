@@ -211,7 +211,7 @@ export class NexusLeaderboardController {
       if (isTopFive) {
         const creditTag = document.createElement('span');
         creditTag.className = 'top-five-pill';
-        creditTag.textContent = 'EXTRA CREDITS QUALIFIER';
+        creditTag.textContent = 'TEAM BONUS QUALIFIER';
         nameWrap.appendChild(creditTag);
       }
 

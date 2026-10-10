@@ -693,6 +693,42 @@ button:disabled {
   color: var(--text-muted);
 }
 
+.bonus-notice-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--nexus-red-bright);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.team-registration-link {
+  align-self: flex-start;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--nexus-red);
+  color: var(--text-primary);
+  border: 1px solid var(--nexus-red-bright);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.team-registration-link:hover,
+.team-registration-link:focus-visible {
+  background: var(--nexus-red-bright);
+  color: var(--text-primary);
+}
+
 .btn-inline-link {
   color: var(--nexus-red-bright);
   text-decoration: underline;
@@ -1228,6 +1264,28 @@ kbd {
   gap: 0.75rem;
 }
 
+.leaderboard-bonus-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: rgba(196, 30, 25, 0.12);
+  border: 1px solid rgba(196, 30, 25, 0.55);
+  border-left: 4px solid var(--nexus-red);
+}
+
+.leaderboard-bonus-notice .bonus-notice-label {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+}
+
+.leaderboard-bonus-notice strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 .leaderboard-meta-controls {
   display: flex;
   align-items: center;
@@ -1450,6 +1508,10 @@ kbd {
     text-align: center;
   }
 
+  .team-registration-link {
+    align-self: center;
+  }
+
   .nexus-form,
   .returning-operator-box {
     margin: 0 auto;
@@ -1476,6 +1538,12 @@ kbd {
 }
 
 @media (max-width: 600px) {
+  .leaderboard-bonus-notice {
+    align-items: stretch;
+    flex-direction: column;
+    text-align: left;
+  }
+
   .header-inner {
     padding: 0.55rem 0.9rem;
   }
