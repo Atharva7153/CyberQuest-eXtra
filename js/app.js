@@ -3,6 +3,7 @@
  * Main Application Orchestrator (with First-Visit Animated Cutscene)
  */
 
+import { CONFIG } from './config.js';
 import { validateRegistrationInput } from './coreEngine.js';
 import { apiClient } from './api.js';
 import { NexusGameController } from './game.js';
