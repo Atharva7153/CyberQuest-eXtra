@@ -19,8 +19,8 @@ import {
 
 const QUESTION_MAP = new Map(QUESTION_BANK.map((q) => [q.id, q]));
 
-test('1. Question Bank — All 380 questions are verified and unambiguous', () => {
-  assert.equal(QUESTION_BANK.length, 380, 'Expected 380 questions in QUESTION_BANK');
+test('1. Question Bank — All 400 challenges (380 True/False + 20 Matrix Breach) are verified', () => {
+  assert.equal(QUESTION_BANK.length, 400, 'Expected 400 challenges in QUESTION_BANK');
 
   let trueCount = 0;
   let falseCount = 0;
@@ -63,7 +63,7 @@ test('2. Registration & Phone Normalization — Enforces Indian mobile format an
   assert.equal(reg2.isReturning, true);
 });
 
-test('3. Scoring & 6-Question Session — Strips correct answers and calculates points server-side', async () => {
+test('3. Scoring & 7-Challenge Session — Includes 1 mid-round Matrix Breach and calculates points server-side', async () => {
   const engine = new NexusAuthoritativeEngine();
   const player = engine.registerPlayer({ name: 'Riya Sharma', phone: '9812345678' });
   const startMs = 1_700_000_000_000;
@@ -74,7 +74,16 @@ test('3. Scoring & 6-Question Session — Strips correct answers and calculates 
     nowMs: startMs,
   });
 
-  assert.equal(session.questions.length, 6, 'Expected 6 questions per round');
+  assert.equal(session.questions.length, 7, 'Expected 7 challenges per round');
+  const breachIndices = session.questions
+    .map((q, idx) => (String(q.questionId).startsWith('mb') ? idx : -1))
+    .filter((idx) => idx !== -1);
+  assert.equal(breachIndices.length, 1, 'Expected exactly 1 Matrix Breach challenge per round');
+  assert.ok(
+    breachIndices[0] >= 1 && breachIndices[0] <= 5,
+    'Matrix Breach must be placed in the middle of the round (index 1..5)'
+  );
+
   for (const q of session.questions) {
     assert.equal(
       typeof q.correctAnswer,
@@ -83,12 +92,12 @@ test('3. Scoring & 6-Question Session — Strips correct answers and calculates 
     );
   }
 
-  // Answer first 4 questions correctly at 1000ms elapsed, next 2 incorrectly
+  // Answer first 5 challenges correctly at 1000ms elapsed, last 2 incorrectly
   let now = startMs;
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     const q = session.questions[i];
     const authoritative = QUESTION_MAP.get(q.questionId);
-    const submittedAnswer = i < 4 ? authoritative.correctAnswer : !authoritative.correctAnswer;
+    const submittedAnswer = i < 5 ? authoritative.correctAnswer : !authoritative.correctAnswer;
 
     now += 1000;
     const verdict = engine.submitAnswer({
@@ -102,7 +111,7 @@ test('3. Scoring & 6-Question Session — Strips correct answers and calculates 
       nowMs: now,
     });
 
-    if (i < 4) {
+    if (i < 5) {
       assert.equal(verdict.isCorrect, true);
       assert.equal(verdict.pointsAwarded, 140);
     } else {
@@ -118,11 +127,11 @@ test('3. Scoring & 6-Question Session — Strips correct answers and calculates 
     nowMs: now + 100,
   });
 
-  assert.equal(summary.finalScore, 360);
-  assert.equal(summary.correctCount, 4);
+  assert.equal(summary.finalScore, 500);
+  assert.equal(summary.correctCount, 5);
   assert.equal(summary.incorrectCount, 2);
   assert.equal(summary.unansweredCount, 0);
-  assert.equal(summary.accuracy, 67);
+  assert.equal(summary.accuracy, 71);
 });
 
 test('4. Timeouts — Enforces server-side 5s deadline + grace window and counts expired as unanswered', async () => {
@@ -139,7 +148,7 @@ test('4. Timeouts — Enforces server-side 5s deadline + grace window and counts
   const q0 = session.questions[0];
   const authQ0 = QUESTION_MAP.get(q0.questionId);
 
-  // Submit correct boolean AFTER server deadline + grace (7500ms > 6500ms)
+  // Submit correct boolean AFTER server deadline + grace (9500ms > 8000ms)
   const lateVerdict = engine.submitAnswer({
     sessionId: session.sessionId,
     playerId: player.playerId,
@@ -148,7 +157,7 @@ test('4. Timeouts — Enforces server-side 5s deadline + grace window and counts
     questionIndex: 0,
     answer: authQ0.correctAnswer,
     clientElapsedMs: 1200,
-    nowMs: t0 + 7500,
+    nowMs: t0 + 9500,
   });
 
   assert.equal(lateVerdict.timedOut, true);
@@ -163,7 +172,7 @@ test('4. Timeouts — Enforces server-side 5s deadline + grace window and counts
   });
 
   assert.equal(summary.finalScore, 0);
-  assert.equal(summary.unansweredCount, 6);
+  assert.equal(summary.unansweredCount, 7);
 });
 
 test('5. Duplicate Submissions & Order — Rejects duplicate answers and out-of-order indices', () => {

@@ -26,13 +26,13 @@ export const CONFIG = Object.freeze({
   }),
 
   // =========================================================================
-  // GAMEPLAY & SCORING RULES (6 Questions, Fast Arcade Pacing)
+  // GAMEPLAY & SCORING RULES (7 Challenges: 6 True/False + 1 Mid-Round Matrix Breach)
   // =========================================================================
   GAME: Object.freeze({
-    QUESTIONS_PER_RUN: 6,             // 6 questions per round
+    QUESTIONS_PER_RUN: 7,             // 7 challenges per round (includes 1 mid-round Matrix Breach)
     QUESTION_DURATION_MS: 5000,       // 5.0 seconds per question
     MIN_HUMAN_REACTION_MS: 350,       // Option 3: < 350ms rejected as bot/autoclicker spam
-    FAILED_ROUND_COOLDOWN_SEC: 10,    // Option 4: 10s cooldown when failing a round (< 4/6)
+    FAILED_ROUND_COOLDOWN_SEC: 10,    // Option 4: 10s cooldown when failing a round
     SERVER_LATENCY_GRACE_MS: 1500,    // Server-side network latency tolerance window
     PRE_GAME_COUNTDOWN_SEC: 0,        // Start immediately (0s delay) for snappy feel
     FEEDBACK_HOLD_MS: 550,            // Clear 550ms visual flash for CORRECT / WRONG
@@ -59,7 +59,7 @@ export const CONFIG = Object.freeze({
 
   LORE: Object.freeze({
     INITIAL_INTEGRITY: 100,
-    INTEGRITY_BY_QUESTION: Object.freeze([100, 91, 82, 74, 63, 52]),
+    INTEGRITY_BY_QUESTION: Object.freeze([100, 92, 84, 75, 66, 58, 49]),
     MESSAGES: Object.freeze({
       START: 'HUMAN RESISTANCE DETECTED.',
       STREAK_2: 'UNEXPECTED.',

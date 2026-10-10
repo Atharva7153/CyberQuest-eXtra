@@ -441,4 +441,28 @@ export const QUESTION_BANK = Object.freeze([
   { id: 'q378', equation: '9, 18, 27, 36 → NEXT IS 45', correctAnswer: true, difficulty: 2, points: 100 },
   { id: 'q379', equation: '50, 40, 30, 20 → NEXT IS 10', correctAnswer: true, difficulty: 1, points: 100 },
   { id: 'q380', equation: '100, 75, 50, 25 → NEXT IS 5', correctAnswer: false, difficulty: 1, points: 100 },
+
+  // =========================================================================
+  // CATEGORY K — MATRIX BREACH 3x3 GRID MEMORY CHALLENGES (mb01 - mb20)
+  // =========================================================================
+  { id: 'mb01', equation: 'MATRIX BREACH // 1-5-9-3', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb02', equation: 'MATRIX BREACH // 2-5-8-4', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb03', equation: 'MATRIX BREACH // 3-5-7-1', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb04', equation: 'MATRIX BREACH // 4-6-2-8', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb05', equation: 'MATRIX BREACH // 1-2-5-8', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb06', equation: 'MATRIX BREACH // 7-4-1-5', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb07', equation: 'MATRIX BREACH // 9-6-3-5', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb08', equation: 'MATRIX BREACH // 8-5-2-6', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb09', equation: 'MATRIX BREACH // 1-4-8-9', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb10', equation: 'MATRIX BREACH // 3-6-5-2', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb11', equation: 'MATRIX BREACH // 5-1-7-9', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb12', equation: 'MATRIX BREACH // 2-4-6-8', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb13', equation: 'MATRIX BREACH // 9-5-1-7', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb14', equation: 'MATRIX BREACH // 6-5-4-2', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb15', equation: 'MATRIX BREACH // 7-8-5-3', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb16', equation: 'MATRIX BREACH // 4-1-5-9', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb17', equation: 'MATRIX BREACH // 8-7-4-2', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb18', equation: 'MATRIX BREACH // 2-3-6-9', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb19', equation: 'MATRIX BREACH // 5-8-7-4', correctAnswer: true, difficulty: 2, points: 100 },
+  { id: 'mb20', equation: 'MATRIX BREACH // 1-3-9-7', correctAnswer: true, difficulty: 2, points: 100 },
 ]);

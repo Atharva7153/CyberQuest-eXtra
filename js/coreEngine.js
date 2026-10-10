@@ -149,9 +149,10 @@ export function evaluateEquationTruth(equationStr) {
 }
 
 /**
- * Selects a balanced sequence of questions across difficulty tiers 1, 2, and 3.
+ * Selects a balanced sequence of questions across difficulty tiers 1, 2, and 3,
+ * plus 1 Matrix Breach challenge placed randomly in the middle of the round when count >= 7.
  */
-export function selectBalancedQuestions(bank = QUESTION_BANK, count = 6, rng = Math.random) {
+export function selectBalancedQuestions(bank = QUESTION_BANK, count = 7, rng = Math.random) {
   const shuffle = (arr) => {
     const copy = [...arr];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -161,12 +162,18 @@ export function selectBalancedQuestions(bank = QUESTION_BANK, count = 6, rng = M
     return copy;
   };
 
-  const tier1 = shuffle(bank.filter((q) => q.difficulty === 1));
-  const tier2 = shuffle(bank.filter((q) => q.difficulty === 2));
-  const tier3 = shuffle(bank.filter((q) => q.difficulty === 3));
+  const standardBank = bank.filter((q) => !String(q.id).startsWith('mb'));
+  const breachBank = shuffle(bank.filter((q) => String(q.id).startsWith('mb')));
 
-  const perTier = Math.floor(count / 3);
-  const remainder = count - perTier * 3;
+  const includeBreach = count >= 7 && breachBank.length > 0;
+  const standardCount = includeBreach ? count - 1 : count;
+
+  const tier1 = shuffle(standardBank.filter((q) => q.difficulty === 1));
+  const tier2 = shuffle(standardBank.filter((q) => q.difficulty === 2));
+  const tier3 = shuffle(standardBank.filter((q) => q.difficulty === 3));
+
+  const perTier = Math.floor(standardCount / 3);
+  const remainder = standardCount - perTier * 3;
 
   const selected = [
     ...tier1.slice(0, perTier + (remainder > 0 ? 1 : 0)),
@@ -174,18 +181,27 @@ export function selectBalancedQuestions(bank = QUESTION_BANK, count = 6, rng = M
     ...tier3.slice(0, perTier),
   ];
 
-  if (selected.length < count) {
+  if (selected.length < standardCount) {
     const usedIds = new Set(selected.map((q) => q.id));
-    const pool = shuffle(bank.filter((q) => !usedIds.has(q.id)));
-    selected.push(...pool.slice(0, count - selected.length));
+    const pool = shuffle(standardBank.filter((q) => !usedIds.has(q.id)));
+    selected.push(...pool.slice(0, standardCount - selected.length));
   }
 
-  return shuffle(selected.slice(0, count));
+  const finalSequence = shuffle(selected.slice(0, standardCount));
+
+  if (includeBreach) {
+    // Place Matrix Breach randomly in the middle of the round (indices 1..count-2)
+    const middleIndex = 1 + Math.floor(rng() * (count - 2));
+    finalSequence.splice(middleIndex, 0, breachBank[0]);
+  }
+
+  return finalSequence;
 }
 
 /**
  * Calculates server-side points for a single question answer.
- * - Incorrect or unanswered: 0 points
+ * - Incorrect: -100 points
+ * - Unanswered/Timed out: 0 points
  * - Correct within deadline: basePoints (100) + speed bonus (0..50)
  */
 export function calculateAnswerPoints({
@@ -242,9 +258,9 @@ export class NexusAuthoritativeEngine {
   constructor(options = {}) {
     this.questionBank = options.questionBank || QUESTION_BANK;
     this.questionMap = new Map(this.questionBank.map((q) => [q.id, q]));
-    this.questionsPerRun = options.questionsPerRun ?? 6;
+    this.questionsPerRun = options.questionsPerRun ?? 7;
     this.questionDurationMs = options.questionDurationMs ?? 5000;
-    this.latencyGraceMs = options.latencyGraceMs ?? 1500;
+    this.latencyGraceMs = options.latencyGraceMs ?? 3000;
     this.preGameCountdownMs = (options.preGameCountdownSec ?? 0) * 1000;
     this.basePoints = options.basePoints ?? 100;
     this.maxSpeedBonus = options.maxSpeedBonus ?? 50;

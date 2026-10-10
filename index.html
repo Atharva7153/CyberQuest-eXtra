@@ -150,7 +150,7 @@
       <div class="editorial-split login-split">
         <div class="editorial-copy">
           <div class="tag-row">
-            <span class="red-tag-block">6-QUESTION SPRINT</span>
+            <span class="red-tag-block">7-CHALLENGE SPRINT</span>
             <button type="button" id="btn-replay-cutscene" class="btn-watch-intro">
               ▶ WATCH INTRO
             </button>
@@ -162,7 +162,7 @@
           </h1>
 
           <p class="editorial-lead">
-            6 rapid True/False logic, cyber &amp; math challenges. 5 seconds each.
+            6 rapid True/False challenges + 1 surprise Matrix Breach grid hack. 5 seconds each.
           </p>
 
           <!-- Eye-Catching Open Typographic Countdown Timer -->
@@ -266,7 +266,7 @@
             </div>
             <div class="cta-row">
               <button type="button" id="btn-begin-mission" class="btn-primary-red">
-                PLAY 6-QUESTION ROUND
+                PLAY 7-CHALLENGE ROUND
                 <span class="btn-arrow" aria-hidden="true">→</span>
               </button>
               <button type="button" id="btn-briefing-leaderboard" class="btn-secondary-dark">
@@ -300,7 +300,7 @@
     </section>
 
     <!-- ===================================================================
-         SCREEN 2 — GAMEPLAY (6 Questions, Mobile Single-Screen Fit)
+         SCREEN 2 — GAMEPLAY (7 Challenges, Mobile Single-Screen Fit)
          =================================================================== -->
     <section id="screen-game" class="screen-section game-portal-section" hidden aria-label="Active Game">
       <div class="game-arena-container">
@@ -331,7 +331,7 @@
         <div class="game-hud-grid">
           <div class="hud-cell">
             <span id="hud-label-question" class="hud-label">QUESTION</span>
-            <strong id="game-question-progress" class="hud-value">01 / 06</strong>
+            <strong id="game-question-progress" class="hud-value">01 / 07</strong>
           </div>
 
           <div class="hud-cell hud-cell-center">
@@ -353,7 +353,7 @@
         <!-- Equation Stage with Big Clear Verdict Banner -->
         <div id="game-equation-box" class="equation-stage">
           <div class="equation-stage-meta">
-            <span id="game-difficulty-badge" class="difficulty-pill">QUESTION 1 OF 6</span>
+            <span id="game-difficulty-badge" class="difficulty-pill">QUESTION 1 OF 7</span>
             <span id="game-feedback-badge" class="game-feedback-badge" aria-live="assertive">
               CHOOSE TRUE OR FALSE
             </span>
@@ -362,10 +362,29 @@
           <div id="game-equation" class="equation-display" aria-live="assertive">
             17 + 28 = 45
           </div>
+
+          <!-- Mid-Round Matrix Breach 3x3 Memory Grid -->
+          <div id="matrix-breach-stage" class="matrix-breach-stage" hidden>
+            <div class="matrix-breach-header">
+              <span class="matrix-breach-title">⚡ MATRIX BREACH // MEMORY PROTOCOL</span>
+              <span id="matrix-breach-status" class="matrix-breach-status">WATCH THE 4-NODE SEQUENCE...</span>
+            </div>
+            <div id="matrix-breach-grid" class="matrix-breach-grid" role="group" aria-label="Matrix Breach 3x3 Grid">
+              <button type="button" class="matrix-node" data-node="1"><span>01</span></button>
+              <button type="button" class="matrix-node" data-node="2"><span>02</span></button>
+              <button type="button" class="matrix-node" data-node="3"><span>03</span></button>
+              <button type="button" class="matrix-node" data-node="4"><span>04</span></button>
+              <button type="button" class="matrix-node" data-node="5"><span>05</span></button>
+              <button type="button" class="matrix-node" data-node="6"><span>06</span></button>
+              <button type="button" class="matrix-node" data-node="7"><span>07</span></button>
+              <button type="button" class="matrix-node" data-node="8"><span>08</span></button>
+              <button type="button" class="matrix-node" data-node="9"><span>09</span></button>
+            </div>
+          </div>
         </div>
 
         <!-- Large Touch & Keyboard Accessible TRUE / FALSE Buttons -->
-        <div class="answer-controls-grid" role="group" aria-label="True or False">
+        <div id="answer-controls-grid" class="answer-controls-grid" role="group" aria-label="True or False">
           <button type="button" id="btn-answer-false" class="btn-decision btn-false">
             <span class="decision-key-hint" aria-hidden="true">← TAP OR LEFT</span>
             <span class="decision-label">FALSE</span>

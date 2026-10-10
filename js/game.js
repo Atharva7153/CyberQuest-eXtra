@@ -29,6 +29,10 @@ export class NexusGameController {
     this.rafId = null;
     this.countdownTimerId = null;
     this.advanceTimeoutId = null;
+    this.breachFlashTimers = [];
+    this.isMatrixBreachActive = false;
+    this.breachSequence = [];
+    this.breachStepIndex = 0;
 
     this.els = {
       screenGame: document.getElementById('screen-game'),
@@ -56,9 +60,18 @@ export class NexusGameController {
       difficultyBadge: document.getElementById('game-difficulty-badge'),
       feedbackBadge: document.getElementById('game-feedback-badge'),
 
+      matrixBreachStage: document.getElementById('matrix-breach-stage'),
+      matrixBreachStatus: document.getElementById('matrix-breach-status'),
+      matrixBreachGrid: document.getElementById('matrix-breach-grid'),
+      answerControlsGrid: document.getElementById('answer-controls-grid'),
+
       btnFalse: document.getElementById('btn-answer-false'),
       btnTrue: document.getElementById('btn-answer-true'),
     };
+
+    this.matrixNodes = this.els.matrixBreachGrid
+      ? Array.from(this.els.matrixBreachGrid.querySelectorAll('.matrix-node'))
+      : [];
 
     this._boundKeyDown = this._handleKeyDown.bind(this);
     this._bindEvents();
@@ -67,20 +80,38 @@ export class NexusGameController {
   _bindEvents() {
     if (this.els.btnFalse) {
       this.els.btnFalse.addEventListener('click', () => {
-        this.commitAnswer(false);
+        if (!this.isMatrixBreachActive) this.commitAnswer(false);
       });
     }
     if (this.els.btnTrue) {
       this.els.btnTrue.addEventListener('click', () => {
-        this.commitAnswer(true);
+        if (!this.isMatrixBreachActive) this.commitAnswer(true);
       });
     }
+    this.matrixNodes.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const nodeNum = Number(btn.getAttribute('data-node'));
+        this._handleMatrixNodeTap(nodeNum, btn);
+      });
+    });
     window.addEventListener('keydown', this._boundKeyDown);
   }
 
   _handleKeyDown(e) {
     if (!this.isRunActive || this.isQuestionLocked) return;
     if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+
+    if (this.isMatrixBreachActive) {
+      if (/^[1-9]$/.test(e.key)) {
+        e.preventDefault();
+        const nodeNum = Number(e.key);
+        const btn = this.matrixNodes.find((b) => Number(b.getAttribute('data-node')) === nodeNum);
+        if (btn && !btn.disabled) {
+          this._handleMatrixNodeTap(nodeNum, btn);
+        }
+      }
+      return;
+    }
 
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
@@ -173,6 +204,19 @@ export class NexusGameController {
     this.countdownTimerId = setTimeout(tick, 750);
   }
 
+  _clearBreachTimers() {
+    if (Array.isArray(this.breachFlashTimers)) {
+      this.breachFlashTimers.forEach((id) => clearTimeout(id));
+    }
+    this.breachFlashTimers = [];
+  }
+
+  _parseBreachSequence(equationStr) {
+    const match = String(equationStr || '').match(/([1-9](?:-[1-9])+)/);
+    if (!match) return [1, 5, 9, 3];
+    return match[1].split('-').map((n) => Number(n));
+  }
+
   _presentQuestion(index) {
     if (!this.isRunActive || !this.session) return;
     const questions = this.session.questions || [];
@@ -182,6 +226,7 @@ export class NexusGameController {
       return;
     }
 
+    this._clearBreachTimers();
     this.currentIndex = index;
     const currentQ = questions[index];
     const total = questions.length;
@@ -194,17 +239,34 @@ export class NexusGameController {
 
     this._applyProgressiveCorruption(index);
     this._updateIntegrityDisplay(index);
-    this._clearFeedbackBadge();
 
     if (this.els.equationContainer) {
       this.els.equationContainer.classList.remove('stage-correct', 'stage-wrong');
     }
+
+    const isBreach =
+      String(currentQ.questionId || '').startsWith('mb') ||
+      String(currentQ.equation || '').toUpperCase().startsWith('MATRIX BREACH');
+
+    this.isMatrixBreachActive = isBreach;
+
+    if (isBreach) {
+      this._presentMatrixBreachQuestion(currentQ, index, total);
+      return;
+    }
+
+    // Standard True/False Question
+    if (this.els.matrixBreachStage) this.els.matrixBreachStage.hidden = true;
     if (this.els.equationText) {
+      this.els.equationText.hidden = false;
       this.els.equationText.textContent = currentQ.equation;
     }
+    if (this.els.answerControlsGrid) this.els.answerControlsGrid.hidden = false;
+
     if (this.els.difficultyBadge) {
       this.els.difficultyBadge.textContent = `QUESTION ${index + 1} OF ${total}`;
     }
+    this._clearFeedbackBadge();
 
     this.isQuestionLocked = false;
     this._setButtonsDisabled(true);
@@ -220,6 +282,108 @@ export class NexusGameController {
     }, CONFIG.GAME.MIN_HUMAN_REACTION_MS || 350);
 
     this._startQuestionTimerLoop();
+  }
+
+  _presentMatrixBreachQuestion(currentQ, index, total) {
+    this.isQuestionLocked = true;
+    this.breachSequence = this._parseBreachSequence(currentQ.equation);
+    this.breachStepIndex = 0;
+
+    if (this.els.equationText) this.els.equationText.hidden = true;
+    if (this.els.answerControlsGrid) this.els.answerControlsGrid.hidden = true;
+    if (this.els.matrixBreachStage) this.els.matrixBreachStage.hidden = false;
+
+    if (this.els.difficultyBadge) {
+      this.els.difficultyBadge.textContent = `MATRIX BREACH // ${index + 1} OF ${total}`;
+    }
+    if (this.els.feedbackBadge) {
+      this.els.feedbackBadge.textContent = '👁 WATCH SEQUENCE...';
+      this.els.feedbackBadge.className = 'game-feedback-badge';
+    }
+    if (this.els.matrixBreachStatus) {
+      this.els.matrixBreachStatus.textContent = 'MEMORIZE THE 4 FLASHING NODES...';
+    }
+
+    if (this.els.timerBarFill) {
+      this.els.timerBarFill.style.transform = 'scaleX(1)';
+      this.els.timerBarFill.classList.remove('timer-critical');
+    }
+    if (this.els.valueTime) {
+      this.els.valueTime.textContent = '05.0s';
+    }
+
+    this.matrixNodes.forEach((btn) => {
+      btn.disabled = true;
+      btn.classList.remove('is-flashing', 'is-correct-step', 'is-wrong-step');
+    });
+
+    const stepMs = 420;
+    const holdMs = 280;
+
+    this.breachSequence.forEach((nodeNum, stepIdx) => {
+      const targetBtn = this.matrixNodes.find(
+        (b) => Number(b.getAttribute('data-node')) === nodeNum
+      );
+      const tOn = setTimeout(() => {
+        if (!this.isRunActive) return;
+        this.matrixNodes.forEach((b) => b.classList.remove('is-flashing'));
+        if (targetBtn) targetBtn.classList.add('is-flashing');
+      }, 200 + stepIdx * stepMs);
+
+      const tOff = setTimeout(() => {
+        if (!this.isRunActive) return;
+        if (targetBtn) targetBtn.classList.remove('is-flashing');
+      }, 200 + stepIdx * stepMs + holdMs);
+
+      this.breachFlashTimers.push(tOn, tOff);
+    });
+
+    const unlockDelay = 250 + this.breachSequence.length * stepMs;
+    const tStartInput = setTimeout(() => {
+      if (!this.isRunActive) return;
+      this.isQuestionLocked = false;
+      this.matrixNodes.forEach((btn) => {
+        btn.disabled = false;
+        btn.classList.remove('is-flashing');
+      });
+      if (this.els.matrixBreachStatus) {
+        this.els.matrixBreachStatus.textContent = `REPEAT SEQUENCE (0 / ${this.breachSequence.length})`;
+      }
+      if (this.els.feedbackBadge) {
+        this.els.feedbackBadge.textContent = `TAP NODES IN ORDER (0/${this.breachSequence.length})`;
+      }
+      this.questionStartPerfMs = performance.now();
+      this._startQuestionTimerLoop();
+    }, unlockDelay);
+
+    this.breachFlashTimers.push(tStartInput);
+  }
+
+  _handleMatrixNodeTap(nodeNum, btnEl) {
+    if (!this.isRunActive || this.isQuestionLocked || !this.isMatrixBreachActive) return;
+
+    const expectedNode = this.breachSequence[this.breachStepIndex];
+    if (nodeNum === expectedNode) {
+      btnEl.classList.add('is-correct-step');
+      this.breachStepIndex += 1;
+      const totalSteps = this.breachSequence.length;
+
+      if (this.els.matrixBreachStatus) {
+        this.els.matrixBreachStatus.textContent = `REPEAT SEQUENCE (${this.breachStepIndex} / ${totalSteps})`;
+      }
+      if (this.els.feedbackBadge) {
+        this.els.feedbackBadge.textContent = `TAP NODES IN ORDER (${this.breachStepIndex}/${totalSteps})`;
+      }
+
+      if (this.breachStepIndex >= totalSteps) {
+        this.matrixNodes.forEach((b) => (b.disabled = true));
+        this.commitAnswer(true);
+      }
+    } else {
+      btnEl.classList.add('is-wrong-step');
+      this.matrixNodes.forEach((b) => (b.disabled = true));
+      this.commitAnswer(false);
+    }
   }
 
   _startQuestionTimerLoop() {
@@ -271,6 +435,7 @@ export class NexusGameController {
     const minReactionMs = CONFIG.GAME.MIN_HUMAN_REACTION_MS || 350;
 
     this.isQuestionLocked = true;
+    this._clearBreachTimers();
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
@@ -281,10 +446,12 @@ export class NexusGameController {
     }
 
     this._setButtonsDisabled(true);
+    this.matrixNodes.forEach((b) => (b.disabled = true));
 
     const activeQuestion = this.session.questions[this.currentIndex];
     const timedOut = answerValue === null;
-    const isBotSpeedSpam = !timedOut && rawElapsedMs < minReactionMs;
+    const isBotSpeedSpam =
+      !timedOut && !this.isMatrixBreachActive && rawElapsedMs < minReactionMs;
     const expectedTruth = evaluateEquationTruth(activeQuestion.equation);
     const isCorrect = !timedOut && !isBotSpeedSpam && answerValue === expectedTruth;
 
@@ -443,6 +610,7 @@ export class NexusGameController {
   }
 
   stopAllTimers() {
+    this._clearBreachTimers();
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;

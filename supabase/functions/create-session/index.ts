@@ -20,7 +20,7 @@ import {
   verifyPlayerOwnership,
 } from '../_shared/security.ts';
 
-const QUESTIONS_PER_RUN = 6;
+const QUESTIONS_PER_RUN = 7;
 const QUESTION_DURATION_MS = 5000;
 const PRE_GAME_COUNTDOWN_SEC = 0;
 
@@ -78,20 +78,35 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    let candidatePool = allQuestions.filter((q) => !seenQuestionIds.has(q.id));
-    if (candidatePool.length < QUESTIONS_PER_RUN * 3) {
-      candidatePool = allQuestions;
+    const allStandard = allQuestions.filter((q) => !String(q.id).startsWith('mb'));
+    const allBreach = allQuestions.filter((q) => String(q.id).startsWith('mb'));
+
+    let candidateStandard = allStandard.filter((q) => !seenQuestionIds.has(q.id));
+    if (candidateStandard.length < 18) {
+      candidateStandard = allStandard;
     }
 
-    const tier1 = shuffle(candidatePool.filter((q) => q.difficulty === 1));
-    const tier2 = shuffle(candidatePool.filter((q) => q.difficulty === 2));
-    const tier3 = shuffle(candidatePool.filter((q) => q.difficulty === 3));
+    let candidateBreach = allBreach.filter((q) => !seenQuestionIds.has(q.id));
+    if (candidateBreach.length === 0) {
+      candidateBreach = allBreach;
+    }
+
+    const tier1 = shuffle(candidateStandard.filter((q) => q.difficulty === 1));
+    const tier2 = shuffle(candidateStandard.filter((q) => q.difficulty === 2));
+    const tier3 = shuffle(candidateStandard.filter((q) => q.difficulty === 3));
 
     const selected = shuffle([
       ...tier1.slice(0, 2),
       ...tier2.slice(0, 2),
       ...tier3.slice(0, 2),
-    ]).slice(0, QUESTIONS_PER_RUN);
+    ]).slice(0, 6);
+
+    if (candidateBreach.length > 0) {
+      const breachPick = shuffle(candidateBreach)[0];
+      // Insert Matrix Breach randomly in the middle of the 7-question round (indices 1..5)
+      const middleIdx = 1 + Math.floor(Math.random() * 5);
+      selected.splice(middleIdx, 0, breachPick);
+    }
 
     const sequence = selected.map((q, idx) => ({
       index: idx,
