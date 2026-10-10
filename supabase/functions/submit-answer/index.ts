@@ -165,12 +165,17 @@ Deno.serve(async (req: Request) => {
       ? durationMs
       : Math.min(
           durationMs,
-          typeof clientElapsedMs === 'number' && clientElapsedMs > 0
+          typeof clientElapsedMs === 'number' && clientElapsedMs >= 0
             ? Math.max(clientElapsedMs, serverElapsedMs - SERVER_LATENCY_GRACE_MS)
             : serverElapsedMs
         );
 
-    const isCorrect = !timedOut && answer === dbQuestion.correct_answer;
+    const isBotSpeedSpam =
+      !timedOut &&
+      ((typeof clientElapsedMs === 'number' && clientElapsedMs < 350) ||
+        effectiveElapsedMs < 350);
+
+    const isCorrect = !timedOut && !isBotSpeedSpam && answer === dbQuestion.correct_answer;
     let pointsAwarded = 0;
 
     if (isCorrect) {

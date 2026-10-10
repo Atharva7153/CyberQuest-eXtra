@@ -207,11 +207,18 @@ export class NexusGameController {
     }
 
     this.isQuestionLocked = false;
-    this._setButtonsDisabled(false);
+    this._setButtonsDisabled(true);
     this.els.btnFalse?.classList.remove('btn-selected', 'btn-correct', 'btn-wrong');
     this.els.btnTrue?.classList.remove('btn-selected', 'btn-correct', 'btn-wrong');
 
     this.questionStartPerfMs = performance.now();
+    if (this.unlockTimeoutId) clearTimeout(this.unlockTimeoutId);
+    this.unlockTimeoutId = setTimeout(() => {
+      if (!this.isQuestionLocked && this.isRunActive) {
+        this._setButtonsDisabled(false);
+      }
+    }, CONFIG.GAME.MIN_HUMAN_REACTION_MS || 350);
+
     this._startQuestionTimerLoop();
   }
 
@@ -252,28 +259,34 @@ export class NexusGameController {
   }
 
   /**
-   * 0ms Instant Answer Verdict + Non-Blocking Server Sync
+   * 0ms Instant Answer Verdict + Anti-Bot Reaction Check (< 350ms) + Non-Blocking Server Sync
    */
   commitAnswer(answerValue) {
     if (!this.isRunActive || this.isQuestionLocked || !this.session) return;
+
+    const durationMs = this.session.questionDurationMs || CONFIG.GAME.QUESTION_DURATION_MS;
+    const rawElapsedMs = Math.round(
+      Math.min(durationMs, Math.max(0, performance.now() - this.questionStartPerfMs))
+    );
+    const minReactionMs = CONFIG.GAME.MIN_HUMAN_REACTION_MS || 350;
 
     this.isQuestionLocked = true;
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
-
-    const durationMs = this.session.questionDurationMs || CONFIG.GAME.QUESTION_DURATION_MS;
-    const rawElapsedMs = Math.round(
-      Math.min(durationMs, Math.max(0, performance.now() - this.questionStartPerfMs))
-    );
+    if (this.unlockTimeoutId) {
+      clearTimeout(this.unlockTimeoutId);
+      this.unlockTimeoutId = null;
+    }
 
     this._setButtonsDisabled(true);
 
     const activeQuestion = this.session.questions[this.currentIndex];
     const timedOut = answerValue === null;
+    const isBotSpeedSpam = !timedOut && rawElapsedMs < minReactionMs;
     const expectedTruth = evaluateEquationTruth(activeQuestion.equation);
-    const isCorrect = !timedOut && answerValue === expectedTruth;
+    const isCorrect = !timedOut && !isBotSpeedSpam && answerValue === expectedTruth;
 
     const pointsAwarded = calculateAnswerPoints({
       isCorrect,
@@ -312,6 +325,9 @@ export class NexusGameController {
     if (timedOut) {
       this._showFeedbackBadge('⏱ TIME UP! (0 PTS)', 'feedback-timeout');
       this._showNexusMessage('TIME EXPIRED.');
+    } else if (isBotSpeedSpam) {
+      this._showFeedbackBadge('✕ TOO FAST / SPAM! (0 PTS)', 'feedback-wrong');
+      this._showNexusMessage('AUTOCLICKER / BOT INPUT REJECTED.');
     } else if (isCorrect) {
       this._showFeedbackBadge(`✓ CORRECT! +${pointsAwarded} PTS`, 'feedback-correct');
       this._showNexusMessage('UNEXPECTED.');
@@ -436,6 +452,10 @@ export class NexusGameController {
     if (this.advanceTimeoutId) {
       clearTimeout(this.advanceTimeoutId);
       this.advanceTimeoutId = null;
+    }
+    if (this.unlockTimeoutId) {
+      clearTimeout(this.unlockTimeoutId);
+      this.unlockTimeoutId = null;
     }
   }
 }

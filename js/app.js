@@ -373,6 +373,12 @@ class NexusApplication {
       return;
     }
 
+    const remainingCooldownSec = this._getRemainingCooldownSec();
+    if (remainingCooldownSec > 0) {
+      this._triggerFailedRoundCooldown(remainingCooldownSec);
+      return;
+    }
+
     if (this.els.btnBeginMission) this.els.btnBeginMission.disabled = true;
     if (this.els.btnPlayAgain) this.els.btnPlayAgain.disabled = true;
 
@@ -390,9 +396,65 @@ class NexusApplication {
         this._showRegistrationError(err.message || 'Unable to start session.');
       }
     } finally {
-      if (this.els.btnBeginMission) this.els.btnBeginMission.disabled = false;
-      if (this.els.btnPlayAgain) this.els.btnPlayAgain.disabled = false;
+      if (this._getRemainingCooldownSec() <= 0) {
+        if (this.els.btnBeginMission) this.els.btnBeginMission.disabled = false;
+        if (this.els.btnPlayAgain) this.els.btnPlayAgain.disabled = false;
+      }
     }
+  }
+
+  _getRemainingCooldownSec() {
+    try {
+      const until = Number(sessionStorage.getItem('nexus_cooldown_until_v1') || 0);
+      if (!until || Date.now() >= until) return 0;
+      return Math.ceil((until - Date.now()) / 1000);
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  _triggerFailedRoundCooldown(seconds = CONFIG.GAME.FAILED_ROUND_COOLDOWN_SEC || 10) {
+    const untilMs = Date.now() + seconds * 1000;
+    try {
+      sessionStorage.setItem('nexus_cooldown_until_v1', String(untilMs));
+    } catch (_) {
+      // Ignore
+    }
+
+    if (this.cooldownIntervalId) {
+      clearInterval(this.cooldownIntervalId);
+      this.cooldownIntervalId = null;
+    }
+
+    const updateButtons = () => {
+      const rem = this._getRemainingCooldownSec();
+      if (rem > 0) {
+        if (this.els.btnPlayAgain) {
+          this.els.btnPlayAgain.disabled = true;
+          this.els.btnPlayAgain.textContent = `COOLDOWN (${rem}s)...`;
+        }
+        if (this.els.btnBeginMission) {
+          this.els.btnBeginMission.disabled = true;
+          this.els.btnBeginMission.textContent = `COOLDOWN (${rem}s)...`;
+        }
+      } else {
+        if (this.cooldownIntervalId) {
+          clearInterval(this.cooldownIntervalId);
+          this.cooldownIntervalId = null;
+        }
+        if (this.els.btnPlayAgain) {
+          this.els.btnPlayAgain.disabled = false;
+          this.els.btnPlayAgain.textContent = 'GRIND NEXT ROUND →';
+        }
+        if (this.els.btnBeginMission) {
+          this.els.btnBeginMission.disabled = false;
+          this.els.btnBeginMission.textContent = 'PLAY 6-QUESTION ROUND →';
+        }
+      }
+    };
+
+    updateButtons();
+    this.cooldownIntervalId = setInterval(updateButtons, 250);
   }
 
   async _handleSessionComplete(payload) {
@@ -425,6 +487,9 @@ class NexusApplication {
     if (this.els.resultsNetworkErrorState) this.els.resultsNetworkErrorState.hidden = true;
     if (this.els.resultsConfirmedContent) this.els.resultsConfirmedContent.hidden = false;
 
+    const correctCount = summary.correctCount ?? 0;
+    const roundFailed = correctCount < 4;
+
     if (this.els.resFinalScore) {
       const roundPts = Number(summary.finalScore || 0);
       this.els.resFinalScore.textContent = `+${roundPts.toLocaleString()}`;
@@ -433,7 +498,13 @@ class NexusApplication {
       this.els.resPersonalBest.textContent = Number(summary.personalBest || 0).toLocaleString();
     }
     if (this.els.resNewBestBadge) {
-      this.els.resNewBestBadge.hidden = !summary.isNewPersonalBest;
+      if (roundFailed) {
+        this.els.resNewBestBadge.textContent = 'FAILED (< 4/6) • 10s COOLDOWN';
+        this.els.resNewBestBadge.hidden = false;
+      } else {
+        this.els.resNewBestBadge.textContent = 'ADDED TO TOTAL!';
+        this.els.resNewBestBadge.hidden = !summary.isNewPersonalBest;
+      }
     }
 
     if (this.els.resRank) {
@@ -446,7 +517,7 @@ class NexusApplication {
     }
 
     if (this.els.resCorrect) {
-      this.els.resCorrect.textContent = `${summary.correctCount ?? 0} / ${summary.totalQuestions ?? 6}`;
+      this.els.resCorrect.textContent = `${correctCount} / ${summary.totalQuestions ?? 6}`;
     }
     if (this.els.resIncorrect) {
       this.els.resIncorrect.textContent = String(summary.incorrectCount ?? 0);
@@ -459,11 +530,20 @@ class NexusApplication {
     }
 
     if (this.els.resNexusVerdict) {
-      const acc = summary.accuracy ?? 0;
-      this.els.resNexusVerdict.textContent =
-        acc >= 80
-          ? 'NEXUS: "Impressive speed under pressure. Your judgement has been logged."'
-          : 'NEXUS: "Every hesitation under time pressure has been recorded."';
+      if (roundFailed) {
+        this.els.resNexusVerdict.textContent =
+          'NEXUS: "Too many wrong answers (< 4/6). 10-second anti-spam cooldown engaged."';
+      } else {
+        const acc = summary.accuracy ?? 0;
+        this.els.resNexusVerdict.textContent =
+          acc >= 80
+            ? 'NEXUS: "Impressive speed under pressure. Your judgement has been logged."'
+            : 'NEXUS: "Every hesitation under time pressure has been recorded."';
+      }
+    }
+
+    if (roundFailed) {
+      this._triggerFailedRoundCooldown(CONFIG.GAME.FAILED_ROUND_COOLDOWN_SEC || 10);
     }
   }
 

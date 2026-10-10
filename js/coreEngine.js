@@ -453,7 +453,12 @@ export class NexusAuthoritativeEngine {
             : serverElapsedMs
         );
 
-    const isCorrect = !timedOut && answer === authoritativeQuestion.correctAnswer;
+    const isBotSpeedSpam =
+      !timedOut &&
+      ((typeof clientElapsedMs === 'number' && clientElapsedMs < 350) ||
+        effectiveElapsedMs < 350);
+    const isCorrect =
+      !timedOut && !isBotSpeedSpam && answer === authoritativeQuestion.correctAnswer;
     const pointsAwarded = calculateAnswerPoints({
       isCorrect,
       elapsedMs: effectiveElapsedMs,

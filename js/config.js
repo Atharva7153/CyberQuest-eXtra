@@ -31,6 +31,8 @@ export const CONFIG = Object.freeze({
   GAME: Object.freeze({
     QUESTIONS_PER_RUN: 6,             // 6 questions per round
     QUESTION_DURATION_MS: 5000,       // 5.0 seconds per question
+    MIN_HUMAN_REACTION_MS: 350,       // Option 3: < 350ms rejected as bot/autoclicker spam
+    FAILED_ROUND_COOLDOWN_SEC: 10,    // Option 4: 10s cooldown when failing a round (< 4/6)
     SERVER_LATENCY_GRACE_MS: 1500,    // Server-side network latency tolerance window
     PRE_GAME_COUNTDOWN_SEC: 0,        // Start immediately (0s delay) for snappy feel
     FEEDBACK_HOLD_MS: 550,            // Clear 550ms visual flash for CORRECT / WRONG
