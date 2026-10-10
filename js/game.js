@@ -290,10 +290,12 @@ export class NexusGameController {
 
     const pointsAwarded = calculateAnswerPoints({
       isCorrect,
+      timedOut,
       elapsedMs: timedOut ? durationMs : rawElapsedMs,
       questionDurationMs: durationMs,
       basePoints: CONFIG.GAME.BASE_POINTS_CORRECT,
       maxSpeedBonus: CONFIG.GAME.MAX_SPEED_BONUS,
+      incorrectPenalty: CONFIG.GAME.POINTS_INCORRECT,
     });
 
     this.runningScore += pointsAwarded;
@@ -326,13 +328,13 @@ export class NexusGameController {
       this._showFeedbackBadge('⏱ TIME UP! (0 PTS)', 'feedback-timeout');
       this._showNexusMessage('TIME EXPIRED.');
     } else if (isBotSpeedSpam) {
-      this._showFeedbackBadge('✕ TOO FAST / SPAM! (0 PTS)', 'feedback-wrong');
+      this._showFeedbackBadge('✕ TOO FAST / SPAM! (-100 PTS)', 'feedback-wrong');
       this._showNexusMessage('AUTOCLICKER / BOT INPUT REJECTED.');
     } else if (isCorrect) {
       this._showFeedbackBadge(`✓ CORRECT! +${pointsAwarded} PTS`, 'feedback-correct');
       this._showNexusMessage('UNEXPECTED.');
     } else {
-      this._showFeedbackBadge('✕ WRONG! (0 PTS)', 'feedback-wrong');
+      this._showFeedbackBadge(`✕ WRONG! (${pointsAwarded} PTS)`, 'feedback-wrong');
       this._showNexusMessage('PREDICTABLE.');
     }
 

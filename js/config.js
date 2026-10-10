@@ -38,7 +38,7 @@ export const CONFIG = Object.freeze({
     FEEDBACK_HOLD_MS: 550,            // Clear 550ms visual flash for CORRECT / WRONG
     BASE_POINTS_CORRECT: 100,         // Base points per correct answer
     MAX_SPEED_BONUS: 50,              // Up to +50 bonus points for speed
-    POINTS_INCORRECT: 0,
+    POINTS_INCORRECT: -100,           // Negative scoring (-100 PTS) on wrong answer
     POINTS_UNANSWERED: 0,
   }),
 

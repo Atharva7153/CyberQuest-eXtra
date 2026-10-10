@@ -190,12 +190,15 @@ export function selectBalancedQuestions(bank = QUESTION_BANK, count = 6, rng = M
  */
 export function calculateAnswerPoints({
   isCorrect,
+  timedOut = false,
   elapsedMs,
   questionDurationMs = 5000,
   basePoints = 100,
   maxSpeedBonus = 50,
+  incorrectPenalty = -100,
 }) {
-  if (!isCorrect) return 0;
+  if (timedOut) return 0;
+  if (!isCorrect) return incorrectPenalty;
   const clampedElapsed = Math.max(0, Math.min(questionDurationMs, elapsedMs));
   const remainingRatio = (questionDurationMs - clampedElapsed) / questionDurationMs;
   const speedBonus = Math.round(remainingRatio * maxSpeedBonus);
@@ -469,6 +472,7 @@ export class NexusAuthoritativeEngine {
       !timedOut && !isBotSpeedSpam && answer === authoritativeQuestion.correctAnswer;
     const pointsAwarded = calculateAnswerPoints({
       isCorrect,
+      timedOut,
       elapsedMs: effectiveElapsedMs,
       questionDurationMs: this.questionDurationMs,
       basePoints: this.basePoints,
@@ -529,8 +533,7 @@ export class NexusAuthoritativeEngine {
   }
 
   /**
-   * Finalizes a session idempotently and updates the player's best score atomically
-   * using GREATEST(existing_best_score, validated_new_score).
+   * Finalizes a session idempotently and updates the player's cumulative score atomically.
    *
    * Any client-supplied `score` field is explicitly ignored/rejected.
    */
@@ -618,16 +621,16 @@ export class NexusAuthoritativeEngine {
       const totalQuestions = session.questionSequence.length;
       const accuracy = Math.round((correctCount / totalQuestions) * 100);
 
-      // Atomic cumulative score addition (Grind Mode: every round adds to total score)
+      // Atomic cumulative score addition (with negative score penalty floored at 0)
       const existingBest = this._scoresByPlayerId.get(playerId);
       let isNewPersonalBest = false;
 
       if (!existingBest) {
-        isNewPersonalBest = true;
+        isNewPersonalBest = finalScore > 0;
         this._scoresByPlayerId.set(playerId, {
           playerId,
           displayName: player.displayName,
-          bestScore: finalScore,
+          bestScore: Math.max(0, finalScore),
           bestAccuracy: accuracy,
           fastestTimeMs: totalResponseTimeMs,
           achievedAt: nowMs,
@@ -640,7 +643,7 @@ export class NexusAuthoritativeEngine {
         existingBest.updatedAt = nowMs;
 
         isNewPersonalBest = finalScore > 0;
-        existingBest.bestScore = existingBest.bestScore + finalScore;
+        existingBest.bestScore = Math.max(0, existingBest.bestScore + finalScore);
         existingBest.bestAccuracy = Math.max(existingBest.bestAccuracy, accuracy);
         existingBest.fastestTimeMs = Math.min(existingBest.fastestTimeMs, totalResponseTimeMs);
         if (finalScore > 0) {

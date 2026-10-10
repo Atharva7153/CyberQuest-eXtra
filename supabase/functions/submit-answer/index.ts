@@ -182,6 +182,8 @@ Deno.serve(async (req: Request) => {
       const remainingRatio = Math.max(0, (durationMs - effectiveElapsedMs) / durationMs);
       const speedBonus = Math.round(remainingRatio * MAX_SPEED_BONUS);
       pointsAwarded = (dbQuestion.points || BASE_POINTS) + speedBonus;
+    } else if (!timedOut) {
+      pointsAwarded = -100;
     }
 
     // Insert validated answer (protected by UNIQUE constraints)

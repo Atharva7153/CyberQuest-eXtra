@@ -493,7 +493,8 @@ class NexusApplication {
 
     if (this.els.resFinalScore) {
       const roundPts = Number(summary.finalScore || 0);
-      this.els.resFinalScore.textContent = `+${roundPts.toLocaleString()}`;
+      const sign = roundPts >= 0 ? '+' : '';
+      this.els.resFinalScore.textContent = `${sign}${roundPts.toLocaleString()}`;
     }
     if (this.els.resPersonalBest) {
       this.els.resPersonalBest.textContent = Number(summary.personalBest || 0).toLocaleString();

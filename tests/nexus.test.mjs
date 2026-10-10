@@ -107,7 +107,7 @@ test('3. Scoring & 6-Question Session — Strips correct answers and calculates 
       assert.equal(verdict.pointsAwarded, 140);
     } else {
       assert.equal(verdict.isCorrect, false);
-      assert.equal(verdict.pointsAwarded, 0);
+      assert.equal(verdict.pointsAwarded, -100);
     }
   }
 
@@ -118,7 +118,7 @@ test('3. Scoring & 6-Question Session — Strips correct answers and calculates 
     nowMs: now + 100,
   });
 
-  assert.equal(summary.finalScore, 560);
+  assert.equal(summary.finalScore, 360);
   assert.equal(summary.correctCount, 4);
   assert.equal(summary.incorrectCount, 2);
   assert.equal(summary.unansweredCount, 0);
