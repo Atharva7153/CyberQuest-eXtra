@@ -58,17 +58,11 @@ class NexusApplication {
       btnBriefingLeaderboard: document.getElementById('btn-briefing-leaderboard'),
 
       // Event Countdown Elements
-      eventCountdownWidget: document.getElementById('event-countdown-widget'),
       eventCountdownLabel: document.getElementById('event-countdown-label'),
-      btnCountdownSound: document.getElementById('btn-countdown-sound'),
-      countdownSoundIcon: document.getElementById('countdown-sound-icon'),
-      countdownSoundText: document.getElementById('countdown-sound-text'),
       cdDays: document.getElementById('cd-days'),
       cdHours: document.getElementById('cd-hours'),
       cdMinutes: document.getElementById('cd-minutes'),
       cdSeconds: document.getElementById('cd-seconds'),
-      cdSecBox: document.getElementById('cd-sec-box'),
-      cdSweepBar: document.getElementById('cd-sweep-bar'),
 
       // Results Screen
       resultsProcessingState: document.getElementById('results-processing-state'),
@@ -139,69 +133,15 @@ class NexusApplication {
       return;
     }
 
-    this.countdownAudioCtx = null;
-    this.isCountdownSoundEnabled = true;
-
-    const ensureAudioContext = () => {
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return null;
-        if (!this.countdownAudioCtx) {
-          this.countdownAudioCtx = new AudioCtx();
-        }
-        if (this.countdownAudioCtx.state === 'suspended') {
-          this.countdownAudioCtx.resume().catch(() => {});
-        }
-        return this.countdownAudioCtx;
-      } catch (_) {
-        return null;
-      }
-    };
-
-    // Unlock Web Audio on first user touch/click/key anywhere on mobile or desktop
-    const unlockEvents = ['pointerdown', 'touchstart', 'keydown'];
-    const handleFirstInteraction = () => {
-      ensureAudioContext();
-    };
-    unlockEvents.forEach((evt) => {
-      document.addEventListener(evt, handleFirstInteraction, { once: true, passive: true });
-    });
-
-    if (this.els.btnCountdownSound) {
-      this.els.btnCountdownSound.addEventListener('click', () => {
-        this.isCountdownSoundEnabled = !this.isCountdownSoundEnabled;
-        if (this.isCountdownSoundEnabled) {
-          ensureAudioContext();
-          this.els.btnCountdownSound.classList.remove('is-muted');
-          this.els.btnCountdownSound.classList.add('is-active');
-          if (this.els.countdownSoundIcon) this.els.countdownSoundIcon.textContent = '🔊';
-          if (this.els.countdownSoundText) this.els.countdownSoundText.textContent = 'TICK ON';
-          this._playDramaticTickSound(0);
-        } else {
-          this.els.btnCountdownSound.classList.remove('is-active');
-          this.els.btnCountdownSound.classList.add('is-muted');
-          if (this.els.countdownSoundIcon) this.els.countdownSoundIcon.textContent = '🔇';
-          if (this.els.countdownSoundText) this.els.countdownSoundText.textContent = 'MUTED';
-        }
-      });
-    }
-
     // Target: October 17, 10:00 AM IST (+05:30)
     const year = new Date().getFullYear();
     const targetMs = Date.parse(`${year}-10-17T10:00:00+05:30`);
-
-    const triggerTickVisuals = (el) => {
-      if (!el) return;
-      el.classList.remove('is-ticking');
-      void el.offsetWidth;
-      el.classList.add('is-ticking');
-    };
 
     const updateClock = () => {
       const remainingMs = Math.max(0, targetMs - Date.now());
 
       if (remainingMs <= 0 && this.els.eventCountdownLabel) {
-        this.els.eventCountdownLabel.textContent = 'CYBERQUEST IS LIVE NOW';
+        this.els.eventCountdownLabel.textContent = 'CYBERQUEST IS LIVE:';
       }
 
       const days = Math.floor(remainingMs / 86_400_000);
@@ -209,100 +149,14 @@ class NexusApplication {
       const minutes = Math.floor((remainingMs % 3_600_000) / 60_000);
       const seconds = Math.floor((remainingMs % 60_000) / 1_000);
 
-      const nextDays = String(days).padStart(2, '0');
-      const nextHours = String(hours).padStart(2, '0');
-      const nextMinutes = String(minutes).padStart(2, '0');
-      const nextSecText = String(seconds).padStart(2, '0');
-
-      if (this.els.cdDays.textContent !== nextDays) {
-        this.els.cdDays.textContent = nextDays;
-        triggerTickVisuals(this.els.cdDays);
-      }
-      if (this.els.cdHours.textContent !== nextHours) {
-        this.els.cdHours.textContent = nextHours;
-        triggerTickVisuals(this.els.cdHours);
-      }
-      if (this.els.cdMinutes.textContent !== nextMinutes) {
-        this.els.cdMinutes.textContent = nextMinutes;
-        triggerTickVisuals(this.els.cdMinutes);
-      }
-
-      if (this.els.cdSeconds.textContent !== nextSecText) {
-        this.els.cdSeconds.textContent = nextSecText;
-        triggerTickVisuals(this.els.cdSeconds);
-
-        if (this.els.cdSecBox) {
-          this.els.cdSecBox.classList.remove('is-sec-flash');
-          void this.els.cdSecBox.offsetWidth;
-          this.els.cdSecBox.classList.add('is-sec-flash');
-        }
-
-        if (this.els.cdSweepBar) {
-          this.els.cdSweepBar.classList.remove('is-sweeping');
-          void this.els.cdSweepBar.offsetWidth;
-          this.els.cdSweepBar.classList.add('is-sweeping');
-        }
-
-        if (this.els.eventCountdownWidget) {
-          this.els.eventCountdownWidget.classList.add('is-heartbeat');
-          window.setTimeout(() => {
-            if (this.els.eventCountdownWidget) {
-              this.els.eventCountdownWidget.classList.remove('is-heartbeat');
-            }
-          }, 220);
-        }
-
-        // Play dramatic synthesized clock tick when on the home screen
-        if (this.isCountdownSoundEnabled && this.currentScreen === 'register' && !document.hidden) {
-          this._playDramaticTickSound(seconds);
-        }
-      }
+      this.els.cdDays.textContent = String(days).padStart(2, '0');
+      this.els.cdHours.textContent = String(hours).padStart(2, '0');
+      this.els.cdMinutes.textContent = String(minutes).padStart(2, '0');
+      this.els.cdSeconds.textContent = String(seconds).padStart(2, '0');
     };
 
     updateClock();
-    this.eventCountdownIntervalId = window.setInterval(updateClock, 250);
-  }
-
-  _playDramaticTickSound(secondVal) {
-    try {
-      const ctx = this.countdownAudioCtx;
-      if (!ctx || ctx.state !== 'running') return;
-
-      const now = ctx.currentTime;
-      const isEven = secondVal % 2 === 0;
-
-      // 1. Crisp metallic mechanical clock click (Hans Zimmer style tick-tock)
-      const clickOsc = ctx.createOscillator();
-      const clickGain = ctx.createGain();
-      clickOsc.type = 'triangle';
-      clickOsc.frequency.setValueAtTime(isEven ? 1350 : 980, now);
-      clickOsc.frequency.exponentialRampToValueAtTime(isEven ? 320 : 240, now + 0.028);
-
-      clickGain.gain.setValueAtTime(0.14, now);
-      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.032);
-
-      clickOsc.connect(clickGain);
-      clickGain.connect(ctx.destination);
-      clickOsc.start(now);
-      clickOsc.stop(now + 0.035);
-
-      // 2. Deep cinematic sub-bass pulse so the tick feels dramatic
-      const subOsc = ctx.createOscillator();
-      const subGain = ctx.createGain();
-      subOsc.type = 'sine';
-      subOsc.frequency.setValueAtTime(isEven ? 92 : 76, now);
-      subOsc.frequency.exponentialRampToValueAtTime(34, now + 0.085);
-
-      subGain.gain.setValueAtTime(0.18, now);
-      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
-
-      subOsc.connect(subGain);
-      subGain.connect(ctx.destination);
-      subOsc.start(now);
-      subOsc.stop(now + 0.095);
-    } catch (_) {
-      // Ignore audio errors when browser blocks autoplay prior to gesture
-    }
+    this.eventCountdownIntervalId = window.setInterval(updateClock, 1000);
   }
 
   _maybePlayFirstVisitCutscene() {
