@@ -57,6 +57,13 @@ class NexusApplication {
       btnBeginMission: document.getElementById('btn-begin-mission'),
       btnBriefingLeaderboard: document.getElementById('btn-briefing-leaderboard'),
 
+      // Event Countdown Elements
+      eventCountdownLabel: document.getElementById('event-countdown-label'),
+      cdDays: document.getElementById('cd-days'),
+      cdHours: document.getElementById('cd-hours'),
+      cdMinutes: document.getElementById('cd-minutes'),
+      cdSeconds: document.getElementById('cd-seconds'),
+
       // Results Screen
       resultsProcessingState: document.getElementById('results-processing-state'),
       resultsNetworkErrorState: document.getElementById('results-network-error-state'),
@@ -105,6 +112,7 @@ class NexusApplication {
     const maintEl = document.getElementById('maintenance-overlay');
     if (maintEl) maintEl.hidden = true;
 
+    this._startEventCountdown();
     this._updateOperatorUI();
     this._updateBackendModeBadge();
     this._bindNavigationEvents();
@@ -118,6 +126,44 @@ class NexusApplication {
       // Play animated cutscene automatically on first visit
       this._maybePlayFirstVisitCutscene();
     }
+  }
+
+  _startEventCountdown() {
+    if (!this.els.cdDays || !this.els.cdHours || !this.els.cdMinutes || !this.els.cdSeconds) {
+      return;
+    }
+
+    // Target: October 17, 10:00 AM IST (+05:30)
+    const year = new Date().getFullYear();
+    const targetMs = Date.parse(`${year}-10-17T10:00:00+05:30`);
+
+    const updateClock = () => {
+      const remainingMs = Math.max(0, targetMs - Date.now());
+
+      if (remainingMs <= 0 && this.els.eventCountdownLabel) {
+        this.els.eventCountdownLabel.textContent = '⚡ CYBERQUEST IS LIVE NOW!';
+      }
+
+      const days = Math.floor(remainingMs / 86_400_000);
+      const hours = Math.floor((remainingMs % 86_400_000) / 3_600_000);
+      const minutes = Math.floor((remainingMs % 3_600_000) / 60_000);
+      const seconds = Math.floor((remainingMs % 60_000) / 1_000);
+
+      this.els.cdDays.textContent = String(days).padStart(2, '0');
+      this.els.cdHours.textContent = String(hours).padStart(2, '0');
+      this.els.cdMinutes.textContent = String(minutes).padStart(2, '0');
+
+      const nextSecText = String(seconds).padStart(2, '0');
+      if (this.els.cdSeconds.textContent !== nextSecText) {
+        this.els.cdSeconds.textContent = nextSecText;
+        this.els.cdSeconds.classList.remove('is-ticking');
+        void this.els.cdSeconds.offsetWidth;
+        this.els.cdSeconds.classList.add('is-ticking');
+      }
+    };
+
+    updateClock();
+    this.eventCountdownIntervalId = window.setInterval(updateClock, 1000);
   }
 
   _maybePlayFirstVisitCutscene() {
