@@ -27,7 +27,16 @@ export function jsonResponse(body: Record<string, unknown>, status = 200): Respo
  * Creates a privileged server-side Supabase client using environment variables
  * injected solely into the Edge Function runtime.
  */
+export const MAINTENANCE_LOCK = true;
+
 export function createServiceClient(): SupabaseClient {
+  if (MAINTENANCE_LOCK) {
+    const err = new Error('CYBER QUEST EXTRA is currently under maintenance.');
+    (err as any).status = 503;
+    (err as any).code = 'MAINTENANCE_MODE';
+    throw err;
+  }
+
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 

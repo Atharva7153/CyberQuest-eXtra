@@ -4,6 +4,7 @@
  */
 
 export const CONFIG = Object.freeze({
+  MAINTENANCE_MODE: true,
   EVENT_TITLE: 'CYBER QUEST — NEXUS',
   EVENT_YEAR: 2035,
 

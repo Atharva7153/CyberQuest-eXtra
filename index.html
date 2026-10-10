@@ -19,7 +19,31 @@
 
   <link rel="stylesheet" href="./css/styles.css" />
 </head>
-<body>
+<body class="is-maintenance">
+  <!-- =====================================================================
+       UNDER MAINTENANCE FULL-SCREEN LOCK OVERLAY
+       ===================================================================== -->
+  <div id="maintenance-overlay" class="maintenance-overlay" role="alertdialog" aria-labelledby="maintenance-title">
+    <div class="maintenance-card">
+      <div class="maintenance-status-pill">
+        <span class="rec-dot" aria-hidden="true"></span>
+        SYSTEM OFFLINE // MAINTENANCE MODE
+      </div>
+      <h1 id="maintenance-title" class="display-title-stack maintenance-title">
+        <span class="title-line-white">CYBER QUEST</span>
+        <span class="title-line-red">EXTRA</span>
+      </h1>
+      <div class="maintenance-divider" aria-hidden="true"></div>
+      <h2 class="maintenance-subtitle">UNDER MAINTENANCE</h2>
+      <p class="maintenance-copy">
+        NEXUS has temporarily locked portal access for system upgrades and leaderboard calibration.
+      </p>
+      <p class="maintenance-subnote">
+        Access will resume shortly. Stand by, Resistance.
+      </p>
+    </div>
+  </div>
+
   <!-- =====================================================================
        ANIMATED FIRST-TIME ENTRY CUTSCENE OVERLAY
        ===================================================================== -->
