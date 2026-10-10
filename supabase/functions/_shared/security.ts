@@ -27,7 +27,7 @@ export function jsonResponse(body: Record<string, unknown>, status = 200): Respo
  * Creates a privileged server-side Supabase client using environment variables
  * injected solely into the Edge Function runtime.
  */
-export const MAINTENANCE_LOCK = true;
+export const MAINTENANCE_LOCK = false;
 
 export function createServiceClient(): SupabaseClient {
   if (MAINTENANCE_LOCK) {

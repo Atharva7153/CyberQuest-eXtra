@@ -19,8 +19,8 @@ import {
 
 const QUESTION_MAP = new Map(QUESTION_BANK.map((q) => [q.id, q]));
 
-test('1. Question Bank — All 60 equations are mathematically verified and unambiguous', () => {
-  assert.equal(QUESTION_BANK.length, 60, 'Expected 60 questions in QUESTION_BANK');
+test('1. Question Bank — All 180 questions are verified and unambiguous', () => {
+  assert.equal(QUESTION_BANK.length, 180, 'Expected 180 questions in QUESTION_BANK');
 
   let trueCount = 0;
   let falseCount = 0;
@@ -30,13 +30,13 @@ test('1. Question Bank — All 60 equations are mathematically verified and unam
     assert.equal(
       actualTruth,
       q.correctAnswer,
-      `Equation mismatch on ${q.id} ("${q.equation}"): expected ${actualTruth}, marked as ${q.correctAnswer}`
+      `Question mismatch on ${q.id} ("${q.equation}"): expected ${actualTruth}, marked as ${q.correctAnswer}`
     );
     if (q.correctAnswer) trueCount += 1;
     else falseCount += 1;
   }
 
-  assert.ok(trueCount >= 25 && falseCount >= 25, 'Question bank must be balanced between TRUE and FALSE');
+  assert.ok(trueCount >= 80 && falseCount >= 80, 'Question bank must be balanced between TRUE and FALSE');
 });
 
 test('2. Registration & Phone Normalization — Enforces Indian mobile format and uniqueness', () => {

@@ -109,11 +109,19 @@ export function validateRegistrationInput({ name, phone }) {
   };
 }
 
+const EQUATION_TRUTH_MAP = new Map(
+  QUESTION_BANK.map((q) => [q.equation, q.correctAnswer])
+);
+
 /**
- * Evaluates a mathematical equation string of the form "LHS = RHS"
- * and verifies whether the equality is mathematically true or false.
+ * Evaluates a question statement or mathematical equation string
+ * and verifies whether it is true or false.
  */
 export function evaluateEquationTruth(equationStr) {
+  if (EQUATION_TRUTH_MAP.has(equationStr)) {
+    return EQUATION_TRUTH_MAP.get(equationStr);
+  }
+
   const parts = equationStr.split('=');
   if (parts.length !== 2) {
     throw new Error(`Invalid equation format: ${equationStr}`);
@@ -172,7 +180,7 @@ export function selectBalancedQuestions(bank = QUESTION_BANK, count = 6, rng = M
     selected.push(...pool.slice(0, count - selected.length));
   }
 
-  return selected.slice(0, count);
+  return shuffle(selected.slice(0, count));
 }
 
 /**

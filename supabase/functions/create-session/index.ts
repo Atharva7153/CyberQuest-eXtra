@@ -59,15 +59,39 @@ Deno.serve(async (req: Request) => {
       throw new Error('Question bank unavailable or insufficient questions seeded.');
     }
 
-    const tier1 = shuffle(allQuestions.filter((q) => q.difficulty === 1));
-    const tier2 = shuffle(allQuestions.filter((q) => q.difficulty === 2));
-    const tier3 = shuffle(allQuestions.filter((q) => q.difficulty === 3));
+    // Fetch player's recent 10 sessions to avoid repeating recently seen questions
+    const { data: recentSessions } = await supabase
+      .from('game_sessions')
+      .select('question_sequence')
+      .eq('player_id', player.id)
+      .order('started_at', { ascending: false })
+      .limit(10);
 
-    const selected = [
+    const seenQuestionIds = new Set<string>();
+    if (Array.isArray(recentSessions)) {
+      for (const s of recentSessions) {
+        if (Array.isArray(s.question_sequence)) {
+          for (const item of s.question_sequence) {
+            if (item?.id) seenQuestionIds.add(item.id);
+          }
+        }
+      }
+    }
+
+    let candidatePool = allQuestions.filter((q) => !seenQuestionIds.has(q.id));
+    if (candidatePool.length < QUESTIONS_PER_RUN * 3) {
+      candidatePool = allQuestions;
+    }
+
+    const tier1 = shuffle(candidatePool.filter((q) => q.difficulty === 1));
+    const tier2 = shuffle(candidatePool.filter((q) => q.difficulty === 2));
+    const tier3 = shuffle(candidatePool.filter((q) => q.difficulty === 3));
+
+    const selected = shuffle([
       ...tier1.slice(0, 2),
       ...tier2.slice(0, 2),
       ...tier3.slice(0, 2),
-    ].slice(0, QUESTIONS_PER_RUN);
+    ]).slice(0, QUESTIONS_PER_RUN);
 
     const sequence = selected.map((q, idx) => ({
       index: idx,
