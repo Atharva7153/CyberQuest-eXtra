@@ -19,8 +19,8 @@ import {
 
 const QUESTION_MAP = new Map(QUESTION_BANK.map((q) => [q.id, q]));
 
-test('1. Question Bank — All 400 challenges (380 True/False + 20 Matrix Breach) are verified', () => {
-  assert.equal(QUESTION_BANK.length, 400, 'Expected 400 challenges in QUESTION_BANK');
+test('1. Question Bank — All 900 challenges (880 True/False + 20 Matrix Breach) are verified and randomized', () => {
+  assert.equal(QUESTION_BANK.length, 900, 'Expected 900 challenges in QUESTION_BANK');
 
   let trueCount = 0;
   let falseCount = 0;
@@ -36,7 +36,7 @@ test('1. Question Bank — All 400 challenges (380 True/False + 20 Matrix Breach
     else falseCount += 1;
   }
 
-  assert.ok(trueCount >= 180 && falseCount >= 180, 'Question bank must be balanced between TRUE and FALSE');
+  assert.ok(trueCount >= 420 && falseCount >= 420, 'Question bank must be balanced between TRUE and FALSE');
 });
 
 test('2. Registration & Phone Normalization — Enforces Indian mobile format and uniqueness', () => {

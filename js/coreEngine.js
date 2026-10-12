@@ -162,23 +162,49 @@ export function selectBalancedQuestions(bank = QUESTION_BANK, count = 7, rng = M
     return copy;
   };
 
-  const standardBank = bank.filter((q) => !String(q.id).startsWith('mb'));
+  const hasThreeInARow = (arr) => {
+    for (let i = 0; i <= arr.length - 3; i++) {
+      const a = Boolean(arr[i]?.correctAnswer);
+      const b = Boolean(arr[i + 1]?.correctAnswer);
+      const c = Boolean(arr[i + 2]?.correctAnswer);
+      if (a === b && b === c) return true;
+    }
+    return false;
+  };
+
+  const shuffleWithoutStreaks = (arr) => {
+    let best = shuffle(arr);
+    for (let attempt = 0; attempt < 24; attempt++) {
+      if (!hasThreeInARow(best)) return best;
+      best = shuffle(arr);
+    }
+    const trues = shuffle(arr.filter((q) => Boolean(q.correctAnswer)));
+    const falses = shuffle(arr.filter((q) => !Boolean(q.correctAnswer)));
+    const interleaved = [];
+    let pickTrue = rng() < 0.5;
+    while (trues.length > 0 || falses.length > 0) {
+      if (pickTrue && trues.length > 0) interleaved.push(trues.pop());
+      else if (!pickTrue && falses.length > 0) interleaved.push(falses.pop());
+      else if (trues.length > 0) interleaved.push(trues.pop());
+      else if (falses.length > 0) interleaved.push(falses.pop());
+      pickTrue = !pickTrue;
+    }
+    return interleaved;
+  };
+
+  const standardBank = shuffle(bank.filter((q) => !String(q.id).startsWith('mb')));
   const breachBank = shuffle(bank.filter((q) => String(q.id).startsWith('mb')));
 
   const includeBreach = count >= 7 && breachBank.length > 0;
   const standardCount = includeBreach ? count - 1 : count;
 
-  const tier1 = shuffle(standardBank.filter((q) => q.difficulty === 1));
-  const tier2 = shuffle(standardBank.filter((q) => q.difficulty === 2));
-  const tier3 = shuffle(standardBank.filter((q) => q.difficulty === 3));
-
-  const perTier = Math.floor(standardCount / 3);
-  const remainder = standardCount - perTier * 3;
+  const halfCount = Math.floor(standardCount / 2);
+  const truePool = standardBank.filter((q) => q.correctAnswer === true);
+  const falsePool = standardBank.filter((q) => q.correctAnswer === false);
 
   const selected = [
-    ...tier1.slice(0, perTier + (remainder > 0 ? 1 : 0)),
-    ...tier2.slice(0, perTier + (remainder > 1 ? 1 : 0)),
-    ...tier3.slice(0, perTier),
+    ...truePool.slice(0, halfCount),
+    ...falsePool.slice(0, standardCount - halfCount),
   ];
 
   if (selected.length < standardCount) {
@@ -187,7 +213,7 @@ export function selectBalancedQuestions(bank = QUESTION_BANK, count = 7, rng = M
     selected.push(...pool.slice(0, standardCount - selected.length));
   }
 
-  const finalSequence = shuffle(selected.slice(0, standardCount));
+  const finalSequence = shuffleWithoutStreaks(selected.slice(0, standardCount));
 
   if (includeBreach) {
     // Place Matrix Breach randomly in the middle of the round (indices 1..count-2)
