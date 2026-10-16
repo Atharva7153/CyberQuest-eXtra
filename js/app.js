@@ -103,16 +103,18 @@ class NexusApplication {
   }
 
   _init() {
+    this._startEventCountdown();
+
     if (CONFIG.MAINTENANCE_MODE) {
       document.body.classList.add('is-maintenance');
+      const maintEl = document.getElementById('maintenance-overlay');
+      if (maintEl) maintEl.removeAttribute('hidden');
       return;
     }
 
     document.body.classList.remove('is-maintenance');
     const maintEl = document.getElementById('maintenance-overlay');
     if (maintEl) maintEl.hidden = true;
-
-    this._startEventCountdown();
     this._updateOperatorUI();
     this._updateBackendModeBadge();
     this._bindNavigationEvents();

@@ -15,5 +15,6 @@ supabase/.branches/
 node_modules/
 npm-debug.log*
 
-# Local database CSV exports (contains private player phone numbers)
+# Local database CSV exports & audit reports (contains private player phone numbers)
 *.csv
+*.pdf

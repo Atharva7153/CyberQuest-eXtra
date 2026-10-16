@@ -19,30 +19,77 @@
 
   <link rel="stylesheet" href="./css/styles.css" />
 </head>
-<body>
+<body class="is-maintenance">
   <!-- =====================================================================
-       UNDER MAINTENANCE FULL-SCREEN LOCK OVERLAY
+       SHUTDOWN / LOCK-IN OVERLAY (THANK YOU FOR PLAYING & EVENT TIMER)
        ===================================================================== -->
-  <div id="maintenance-overlay" class="maintenance-overlay" role="alertdialog" aria-labelledby="maintenance-title" hidden>
+  <div id="maintenance-overlay" class="maintenance-overlay" role="alertdialog" aria-labelledby="maintenance-title">
     <div class="maintenance-card">
       <div class="maintenance-status-pill">
         <span class="rec-dot" aria-hidden="true"></span>
-        SYSTEM OFFLINE // MAINTENANCE MODE
+        SYSTEM OFFLINE
       </div>
       <h1 id="maintenance-title" class="display-title-stack maintenance-title">
-        <span class="title-line-white">CYBER QUEST</span>
-        <span class="title-line-red">EXTRA</span>
+        <span class="title-line-white">THANK YOU FOR PLAYING</span>
+        <span class="title-line-red">SEE IN CYBER QUEST</span>
       </h1>
       <div class="maintenance-divider" aria-hidden="true"></div>
-      <h2 class="maintenance-subtitle">UNDER MAINTENANCE</h2>
-      <p class="maintenance-copy">
-        NEXUS has temporarily locked portal access for system upgrades and leaderboard calibration.
-      </p>
-      <p class="maintenance-subnote">
-        Access will resume shortly. Stand by, Resistance.
-      </p>
+
+      <!-- Eye-Catching Open Typographic Countdown Timer -->
+      <div id="event-countdown-widget" class="event-countdown-plain" aria-label="CyberQuest begins countdown">
+        <div class="countdown-plain-header">
+          <span class="rec-dot" aria-hidden="true"></span>
+          <span id="event-countdown-label" class="countdown-plain-label">CYBERQUEST BEGINS IN</span>
+        </div>
+        <div class="countdown-plain-clock">
+          <div class="countdown-plain-unit">
+            <strong id="cd-days">00</strong>
+            <small>DAYS</small>
+          </div>
+          <span class="countdown-plain-sep" aria-hidden="true">:</span>
+          <div class="countdown-plain-unit">
+            <strong id="cd-hours">14</strong>
+            <small>HRS</small>
+          </div>
+          <span class="countdown-plain-sep" aria-hidden="true">:</span>
+          <div class="countdown-plain-unit">
+            <strong id="cd-minutes">00</strong>
+            <small>MIN</small>
+          </div>
+          <span class="countdown-plain-sep" aria-hidden="true">:</span>
+          <div class="countdown-plain-unit countdown-plain-unit-sec">
+            <strong id="cd-seconds" class="countdown-plain-sec">00</strong>
+            <small>SEC</small>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <script>
+    (function () {
+      function tick() {
+        var targetMs = Date.parse('2026-10-17T10:00:00+05:30');
+        var remainingMs = Math.max(0, targetMs - Date.now());
+        var days = Math.floor(remainingMs / 86400000);
+        var hours = Math.floor((remainingMs % 86400000) / 3600000);
+        var minutes = Math.floor((remainingMs % 3600000) / 60000);
+        var seconds = Math.floor((remainingMs % 60000) / 1000);
+
+        var elDays = document.getElementById('cd-days');
+        var elHours = document.getElementById('cd-hours');
+        var elMinutes = document.getElementById('cd-minutes');
+        var elSeconds = document.getElementById('cd-seconds');
+
+        if (elDays) elDays.textContent = String(days).padStart(2, '0');
+        if (elHours) elHours.textContent = String(hours).padStart(2, '0');
+        if (elMinutes) elMinutes.textContent = String(minutes).padStart(2, '0');
+        if (elSeconds) elSeconds.textContent = String(seconds).padStart(2, '0');
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
+  </script>
 
   <!-- =====================================================================
        ANIMATED FIRST-TIME ENTRY CUTSCENE OVERLAY
@@ -164,35 +211,6 @@
           <p class="editorial-lead">
             6 rapid True/False challenges + 1 surprise Matrix Breach grid hack. 5 seconds each.
           </p>
-
-          <!-- Eye-Catching Open Typographic Countdown Timer -->
-          <div id="event-countdown-widget" class="event-countdown-plain" aria-label="CyberQuest begins countdown">
-            <div class="countdown-plain-header">
-              <span class="rec-dot" aria-hidden="true"></span>
-              <span id="event-countdown-label" class="countdown-plain-label">CYBERQUEST BEGINS IN</span>
-            </div>
-            <div class="countdown-plain-clock">
-              <div class="countdown-plain-unit">
-                <strong id="cd-days">06</strong>
-                <small>DAYS</small>
-              </div>
-              <span class="countdown-plain-sep" aria-hidden="true">:</span>
-              <div class="countdown-plain-unit">
-                <strong id="cd-hours">13</strong>
-                <small>HRS</small>
-              </div>
-              <span class="countdown-plain-sep" aria-hidden="true">:</span>
-              <div class="countdown-plain-unit">
-                <strong id="cd-minutes">40</strong>
-                <small>MIN</small>
-              </div>
-              <span class="countdown-plain-sep" aria-hidden="true">:</span>
-              <div class="countdown-plain-unit countdown-plain-unit-sec">
-                <strong id="cd-seconds" class="countdown-plain-sec">00</strong>
-                <small>SEC</small>
-              </div>
-            </div>
-          </div>
 
           <!-- View A: Login Form (Shown when player is not logged in) -->
           <form id="register-form" class="nexus-form" novalidate>
